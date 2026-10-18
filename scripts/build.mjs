@@ -12,11 +12,11 @@ export function patchPersistence(html) {
   const changes = [
     [
       "get(selected).links.push([name,url]);$('modal').classList.remove('open');",
-      "get(selected).links.push([name,url]);persist();$('modal').classList.remove('open');"
+      "get(selected).links.push([name,url]);const saved=persist();$('modal').classList.remove('open');renderEditor();toast(saved?'Documento asociado y guardado':'Documento asociado en memoria; exporta el mapa')"
     ],
     [
       'n.links.splice(Number(b.dataset.delDoc),1);renderEditor()',
-      'n.links.splice(Number(b.dataset.delDoc),1);persist();renderEditor()'
+      'n.links.splice(Number(b.dataset.delDoc),1);const saved=persist();renderEditor();toast(saved?\'Enlace quitado y guardado\':\'Enlace quitado en memoria; exporta el mapa\')'
     ]
   ];
   let output = html;
