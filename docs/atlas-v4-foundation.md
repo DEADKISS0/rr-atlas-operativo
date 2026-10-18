@@ -12,6 +12,7 @@ Rama: `fix/document-link-persistence`
 - La importación JSON usa el mismo validador que la persistencia.
 - Se mantienen los enlaces de Drive como referencias; no se copian archivos ni se almacenan tokens.
 - Se mantiene un historial local acotado con deshacer/rehacer y atajos Ctrl/Cmd+Z, Ctrl/Cmd+Y.
+- La interfaz añade navegación contraíble, minimapa, selección desde minimapa y conexiones contextuales alrededor del nodo activo.
 - Se agregaron pruebas unitarias y CI básica.
 - Se agregó la migración SQL genérica para workspace, membresías, entidades, relaciones, vistas, documentos referenciados y auditoría.
 

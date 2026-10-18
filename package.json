@@ -5,6 +5,6 @@
   "type": "module",
   "scripts": {
     "test": "node --test src/core/atlas-state.test.mjs",
-    "check": "node --check src/core/atlas-state.mjs && npm test"
+    "check": "node --check src/core/atlas-state.mjs && node --check src/ui/atlas-shell.mjs && npm test"
   }
 }
