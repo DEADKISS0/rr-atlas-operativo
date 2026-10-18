@@ -11,6 +11,7 @@ Rama: `fix/document-link-persistence`
 - La escritura fallida conserva el estado en memoria y muestra una salida para exportar.
 - La importación JSON usa el mismo validador que la persistencia.
 - Se mantienen los enlaces de Drive como referencias; no se copian archivos ni se almacenan tokens.
+- Se mantiene un historial local acotado con deshacer/rehacer y atajos Ctrl/Cmd+Z, Ctrl/Cmd+Y.
 - Se agregaron pruebas unitarias y CI básica.
 - Se agregó la migración SQL genérica para workspace, membresías, entidades, relaciones, vistas, documentos referenciados y auditoría.
 
