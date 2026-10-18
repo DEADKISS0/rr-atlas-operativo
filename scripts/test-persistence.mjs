@@ -1,13 +1,14 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { patchPersistence } from './build.mjs';
+import { validateShell } from './build.mjs';
 
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-const output = patchPersistence(html);
+validateShell(html);
+assert.match(html, /src\/app\/main\.mjs/);
+assert.match(html, /src\/styles\/tokens\.css/);
+assert.doesNotMatch(html, /const DEFAULT=/);
+assert.doesNotMatch(html, /localStorage\.setItem/);
+assert.throws(() => validateShell('<!doctype html><html><body></body></html>'), /Missing shell marker/);
+assert.throws(() => validateShell('<!doctype html>src/app/main.mjs src/styles/tokens.css src/styles/layout.css src/styles/components.css data-atlas-layout data-atlas-editor data-atlas-cards const DEFAULT=1'), /Application logic leaked/);
 
-assert.match(output, /get\(selected\)\.links\.push\(\[name,url\]\);const saved=persist\(\)/);
-assert.match(output, /n\.links\.splice\(Number\(b\.dataset\.delDoc\),1\);const saved=persist\(\)/);
-assert.match(output, /No se pudo guardar localmente/);
-assert.throws(() => patchPersistence('<!doctype html><html><body></body></html><p>extra</p>'), /Incomplete HTML/);
-
-console.log('persistence regression: ok');
+console.log('frontend shell regression: ok');

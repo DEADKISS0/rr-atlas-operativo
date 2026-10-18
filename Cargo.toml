@@ -1,0 +1,31 @@
+[workspace]
+members = [
+  "crates/atlas-core",
+  "crates/atlas-proto",
+  "crates/atlas-sync",
+  "crates/atlas-ui",
+  "crates/atlas-web",
+  "crates/atlas-api",
+  "crates/atlas-drive",
+  "crates/xtask",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "LicenseRef-RR-Internal"
+publish = false
+
+[workspace.dependencies]
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+thiserror = "2.0.21"
+url = "2.5.8"
+uuid = { version = "1.28.0", features = ["serde", "v4", "v5", "js"] }
+time = { version = "0.3.55", features = ["serde", "macros"] }
+petgraph = "0.8.3"
+proptest = "1.12.0"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt"] }
+leptos = { version = "0.8.22", default-features = false, features = ["csr"] }

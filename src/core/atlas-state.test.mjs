@@ -6,6 +6,9 @@ import {
   normalizeGraph,
   parseSnapshot,
   validateDriveLink,
+  classifyMediaUrl,
+  drivePreviewUrl,
+  validateMediaAsset,
 } from './atlas-state.mjs';
 
 const graph = {
@@ -21,6 +24,9 @@ const graph = {
       x: 0,
       y: 0,
       links: [],
+      shape: 'rectangle',
+      color: 'fuchsia',
+      media: [],
     },
     {
       id: 'b',
@@ -33,6 +39,9 @@ const graph = {
       x: 100,
       y: 100,
       links: [['Drive', 'https://drive.google.com/file/d/example/view']],
+      shape: 'hexagon',
+      color: 'blue',
+      media: [],
     },
   ],
   lines: [['a', 'b']],
@@ -54,6 +63,27 @@ test('accepts version 1 exports', () => {
     source: 'test',
   }));
   assert.deepEqual(output, graph);
+});
+
+test('adds safe defaults to legacy nodes and classifies media', () => {
+  const legacy = structuredClone(graph);
+  delete legacy.data[0].shape;
+  delete legacy.data[0].color;
+  delete legacy.data[0].media;
+  const normalized = normalizeGraph(legacy);
+  assert.equal(normalized.data[0].shape, 'rectangle');
+  assert.equal(normalized.data[0].color, 'fuchsia');
+  assert.deepEqual(normalized.data[0].media, []);
+  assert.equal(classifyMediaUrl('https://cdn.example.com/photo.webp'), 'image');
+  assert.equal(classifyMediaUrl('https://cdn.example.com/report.pdf'), 'pdf');
+  assert.equal(drivePreviewUrl('https://drive.google.com/file/d/abc123/view'), 'https://drive.google.com/file/d/abc123/preview');
+});
+
+test('validates multimedia assets without allowing unsafe URLs', () => {
+  const asset = validateMediaAsset({ id: 'm1', label: 'Demo', url: 'https://cdn.example.com/demo.mp4', kind: 'auto' });
+  assert.equal(asset.kind, 'video');
+  assert.throws(() => validateMediaAsset({ id: 'm2', label: 'Unsafe', url: 'javascript:alert(1)', kind: 'auto' }), AtlasDataError);
+  assert.throws(() => validateMediaAsset({ id: 'm3', label: 'Creds', url: 'https://user:pass@example.com/file.pdf', kind: 'auto' }), AtlasDataError);
 });
 
 test('rejects unsafe Drive hosts and credentials', () => {

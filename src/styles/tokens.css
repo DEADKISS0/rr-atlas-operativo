@@ -1,0 +1,55 @@
+:root {
+  --rr-fuchsia: #be076d;
+  --rr-mustard: #ded116;
+  --rr-orchid: #973d8f;
+  --rr-ink: #070001;
+  --rr-paper: #fffff3;
+  --rr-panel: #150612;
+  --rr-card: #200b1b;
+  --rr-muted: #d2abc2;
+  --rr-border: #973d8f;
+  --rr-shadow: 7px 7px 0 var(--rr-ink);
+  --rr-radius: 3px;
+  --rr-space-1: 4px;
+  --rr-space-2: 8px;
+  --rr-space-3: 12px;
+  --rr-space-4: 16px;
+  --rr-space-5: 24px;
+  --rr-space-6: 32px;
+  --rr-font: "Arial Nova", "Helvetica Neue", Arial, sans-serif;
+  --rr-bezel: #0b0108;
+  --rr-well: #11020c;
+  --rr-hairline: rgba(255, 255, 255, .16);
+  --rr-panel-shadow: 0 1px 2px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .05), 0 0 0 1px rgba(255, 255, 255, .05);
+}
+
+body.atlas-theme-light {
+  --rr-ink: #f5f5ef;
+  --rr-paper: #171714;
+  --rr-panel: #ffffff;
+  --rr-card: #ffffff;
+  --rr-muted: #62625b;
+  --rr-border: #d4d4cc;
+  --rr-orchid: #b4a3b2;
+  --rr-shadow: 6px 6px 0 #d7d7ce;
+  --rr-bezel: #f1f1eb;
+  --rr-well: #e9e9e2;
+  --rr-hairline: rgba(0, 0, 0, .14);
+  --rr-panel-shadow: 0 1px 2px rgba(28, 25, 23, .06), 0 0 0 1px rgba(28, 25, 23, .11);
+}
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background: var(--rr-bezel);
+  color: var(--rr-paper);
+  font-family: var(--rr-font);
+  font-size: 14px;
+}
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid var(--rr-mustard);
+  outline-offset: 2px;
+}

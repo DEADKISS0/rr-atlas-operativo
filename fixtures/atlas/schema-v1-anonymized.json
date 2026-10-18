@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "nodes": [
+    {
+      "id": "person-01",
+      "title": "Persona 01",
+      "type": "Talento",
+      "desc": "",
+      "owner": "Por definir",
+      "status": "Por validar",
+      "x": 0,
+      "y": 0,
+      "links": []
+    },
+    {
+      "id": "person-02",
+      "title": "Persona 02",
+      "type": "Talento",
+      "desc": "",
+      "owner": "Por definir",
+      "status": "Por validar",
+      "x": 100,
+      "y": 0,
+      "links": []
+    },
+    {
+      "id": "process-01",
+      "title": "Proceso ejemplo",
+      "type": "Proceso",
+      "desc": "",
+      "owner": "Por definir",
+      "status": "Por validar",
+      "x": 200,
+      "y": 0,
+      "links": []
+    }
+  ],
+  "edges": []
+}

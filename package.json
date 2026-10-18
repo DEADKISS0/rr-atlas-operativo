@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test src/core/atlas-state.test.mjs",
-    "check": "node --check src/core/atlas-state.mjs && node --check src/ui/atlas-shell.mjs && npm test"
+    "build": "node scripts/build.mjs",
+    "test": "node --test src/core/atlas-state.test.mjs src/app/atlas-store.test.mjs",
+    "check": "for f in $(find src -name '*.mjs' -print); do node --check \"$f\" || exit 1; done; npm test && node scripts/build.mjs"
   }
 }
