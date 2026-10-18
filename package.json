@@ -1,0 +1,10 @@
+{
+  "name": "rr-atlas-operativo",
+  "version": "4.0.0-foundation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test src/core/atlas-state.test.mjs",
+    "check": "node --check src/core/atlas-state.mjs && npm test"
+  }
+}

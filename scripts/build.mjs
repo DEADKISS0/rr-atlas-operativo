@@ -1,7 +1,9 @@
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { Script } from 'node:vm';
 
 // Transitional build for the v3 single-file prototype. Only these two handlers
 // change; the original HTML, logo, data and localStorage key remain untouched.
@@ -29,9 +31,16 @@ export function patchPersistence(html) {
       throw new Error('Unexpected or ambiguous document handler: build aborted');
     }
   }
-  const scripts = [...output.matchAll(/<script>([\s\S]*?)<\/script>/gi)];
+  const scripts = [...output.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)];
   if (scripts.length !== 1) throw new Error('Expected one inline application script');
-  new Script(scripts[0][1], { filename: 'atlas-inline.js' });
+  const tempDir = mkdtempSync(resolve(tmpdir(), 'rr-atlas-build-'));
+  const tempFile = resolve(tempDir, 'atlas-inline.mjs');
+  try {
+    writeFileSync(tempFile, scripts[0][1], 'utf8');
+    execFileSync(process.execPath, ['--check', tempFile], { stdio: 'pipe' });
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
   return output;
 }
 
