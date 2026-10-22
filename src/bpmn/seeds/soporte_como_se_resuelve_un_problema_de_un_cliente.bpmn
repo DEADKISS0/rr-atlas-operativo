@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="def_flujo_soporte" targetNamespace="https://rraliados.co/bpmn" exporter="RR Aliados · bpmn_xml_v2.py" exporterVersion="2.0">
+  <bpmn:collaboration id="collab_1">
+    <bpmn:participant id="part_1" name="CÓMO SE RESUELVE UN PROBLEMA DE UN CLIENTE" processRef="proc_flujo_soporte"/>
+  </bpmn:collaboration>
+  <bpmn:process id="proc_flujo_soporte" name="CÓMO SE RESUELVE UN PROBLEMA DE UN CLIENTE" isExecutable="false">
+    <bpmn:documentation>CÓMO SE RESUELVE UN PROBLEMA DE UN CLIENTE
+Lo que pasa cuando un cliente escribe que algo no le funciona. El paso 3 es donde se traba hoy. · corte 2026-09-26
+Dueno del proceso: DESCONOCIDO (el spec no lo declara)
+KPI: DESCONOCIDO (el spec no lo declara)
+Fuente: _herramientas/esquemas_bpmn/soporte_como_se_resuelve_un_problema_de_un_cliente.json</bpmn:documentation>
+    <bpmn:laneSet id="laneset_1">
+      <bpmn:lane id="lane_1" name="1 · Quién recibe">
+        <bpmn:flowNodeRef>e_ini</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_anota</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_2" name="2 · Prioridad">
+        <bpmn:flowNodeRef>g_prio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_alta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_media</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_baja</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_3" name="3 · Quien lo resuelve">
+        <bpmn:flowNodeRef>g_ayuda</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_responde</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_arregla</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_ok</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_cierra</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_aprende</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>e_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="e_ini" name="Un cliente escribe">
+      <bpmn:outgoing>sf_1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="ed_e_ini"/>
+    </bpmn:startEvent>
+    <bpmn:task id="t_anota" name="2. Se anota">
+      <bpmn:documentation>Queja, error o pedido. Con fecha.</bpmn:documentation>
+      <bpmn:incoming>sf_1</bpmn:incoming>
+      <bpmn:outgoing>sf_2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g_prio" name="3. ¿Qué tan grave?">
+      <bpmn:incoming>sf_2</bpmn:incoming>
+      <bpmn:outgoing>sf_3</bpmn:outgoing>
+      <bpmn:outgoing>sf_4</bpmn:outgoing>
+      <bpmn:outgoing>sf_5</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="t_alta" name="Alta · se resuelve ya">
+      <bpmn:documentation>El cliente está bloqueado, un cobro, un contrato o una entrega clave.</bpmn:documentation>
+      <bpmn:incoming>sf_3</bpmn:incoming>
+      <bpmn:outgoing>sf_6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_media" name="Media · pronto">
+      <bpmn:documentation>Cambios con fecha cercana.</bpmn:documentation>
+      <bpmn:incoming>sf_4</bpmn:incoming>
+      <bpmn:outgoing>sf_7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_baja" name="Baja · cuando se pueda">
+      <bpmn:documentation>Mejoras o cosas sin fecha.</bpmn:documentation>
+      <bpmn:incoming>sf_5</bpmn:incoming>
+      <bpmn:outgoing>sf_8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:parallelGateway id="g_ayuda" name="4. ¿Le toca a alguien?">
+      <bpmn:incoming>sf_6</bpmn:incoming>
+      <bpmn:incoming>sf_7</bpmn:incoming>
+      <bpmn:incoming>sf_8</bpmn:incoming>
+      <bpmn:outgoing>sf_9</bpmn:outgoing>
+      <bpmn:outgoing>sf_10</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:task id="t_responde" name="5. Se responde">
+      <bpmn:documentation>Se le contesta al cliente.</bpmn:documentation>
+      <bpmn:incoming>sf_9</bpmn:incoming>
+      <bpmn:outgoing>sf_11</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_arregla" name="6. Se arregla">
+      <bpmn:documentation>Se resuelve de verdad, no solo se contesta.</bpmn:documentation>
+      <bpmn:incoming>sf_10</bpmn:incoming>
+      <bpmn:incoming>sf_13</bpmn:incoming>
+      <bpmn:outgoing>sf_12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g_ok" name="7. ¿El cliente quedó bien?">
+      <bpmn:incoming>sf_11</bpmn:incoming>
+      <bpmn:incoming>sf_12</bpmn:incoming>
+      <bpmn:outgoing>sf_13</bpmn:outgoing>
+      <bpmn:outgoing>sf_14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="t_cierra" name="8. Se cierra">
+      <bpmn:documentation>Queda resuelto y archivado.</bpmn:documentation>
+      <bpmn:incoming>sf_14</bpmn:incoming>
+      <bpmn:outgoing>sf_15</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_aprende" name="9. Se aprende">
+      <bpmn:documentation>Para que no vuelva a pasar.</bpmn:documentation>
+      <bpmn:incoming>sf_15</bpmn:incoming>
+      <bpmn:outgoing>sf_16</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="e_fin" name="Resuelto">
+      <bpmn:incoming>sf_16</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:dataObject id="do_d_sop"/>
+    <bpmn:dataObjectReference id="d_sop" dataObjectRef="do_d_sop" name="SOPORTE.md">
+      <bpmn:documentation>Lo que la función sí tiene escrito hoy.</bpmn:documentation>
+    </bpmn:dataObjectReference>
+    <bpmn:sequenceFlow id="sf_1" sourceRef="e_ini" targetRef="t_anota"/>
+    <bpmn:sequenceFlow id="sf_2" sourceRef="t_anota" targetRef="g_prio" name="se prioriza"/>
+    <bpmn:sequenceFlow id="sf_3" sourceRef="g_prio" targetRef="t_alta" name="alta"/>
+    <bpmn:sequenceFlow id="sf_4" sourceRef="g_prio" targetRef="t_media" name="media"/>
+    <bpmn:sequenceFlow id="sf_5" sourceRef="g_prio" targetRef="t_baja" name="baja"/>
+    <bpmn:sequenceFlow id="sf_6" sourceRef="t_alta" targetRef="g_ayuda"/>
+    <bpmn:sequenceFlow id="sf_7" sourceRef="t_media" targetRef="g_ayuda"/>
+    <bpmn:sequenceFlow id="sf_8" sourceRef="t_baja" targetRef="g_ayuda"/>
+    <bpmn:sequenceFlow id="sf_9" sourceRef="g_ayuda" targetRef="t_responde"/>
+    <bpmn:sequenceFlow id="sf_10" sourceRef="g_ayuda" targetRef="t_arregla"/>
+    <bpmn:sequenceFlow id="sf_11" sourceRef="t_responde" targetRef="g_ok"/>
+    <bpmn:sequenceFlow id="sf_12" sourceRef="t_arregla" targetRef="g_ok"/>
+    <bpmn:sequenceFlow id="sf_13" sourceRef="g_ok" targetRef="t_arregla" name="no: otra vez"/>
+    <bpmn:sequenceFlow id="sf_14" sourceRef="g_ok" targetRef="t_cierra" name="sí"/>
+    <bpmn:sequenceFlow id="sf_15" sourceRef="t_cierra" targetRef="t_aprende" name="de aquí sale el aprendizaje"/>
+    <bpmn:sequenceFlow id="sf_16" sourceRef="t_aprende" targetRef="e_fin"/>
+    <bpmn:association id="as_1" sourceRef="d_sop" targetRef="g_prio" associationDirection="One">
+      <bpmn:documentation>qué está escrito</bpmn:documentation>
+    </bpmn:association>
+    <bpmn:textAnnotation id="nota_1">
+      <bpmn:text>FALTA LO MÁS IMPORTANTE: no hay tiempos escritos. No dicen cuántas horas tiene que tardar una prioridad alta. Y si no hay plazo, decir «alta» no significa nada. TODO: definir los tiempos.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_1" sourceRef="nota_1" targetRef="g_prio"/>
+    <bpmn:textAnnotation id="nota_2">
+      <bpmn:text>«Le toca a alguien» se decide de palabra. No hay SLA escrito, no hay dueño por tipo de problema, y el manual de roles no menciona soporte.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_2" sourceRef="nota_2" targetRef="t_responde"/>
+    <bpmn:textAnnotation id="nota_3">
+      <bpmn:text>La confirmación del cliente es el paso que hace que esto sea un proceso y no una cadena de favores: si no confirmó, no se cierra.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_3" sourceRef="nota_3" targetRef="g_ok"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="diagrama_1">
+    <bpmndi:BPMNPlane id="plano_1" bpmnElement="collab_1">
+      <bpmndi:BPMNShape id="part_1_di" bpmnElement="part_1" isHorizontal="true">
+        <dc:Bounds x="100" y="80" width="2220" height="990"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_1_di" bpmnElement="lane_1" isHorizontal="true">
+        <dc:Bounds x="130" y="80" width="2190" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_2_di" bpmnElement="lane_2" isHorizontal="true">
+        <dc:Bounds x="130" y="280" width="2190" height="460"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_3_di" bpmnElement="lane_3" isHorizontal="true">
+        <dc:Bounds x="130" y="740" width="2190" height="330"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_ini_di" bpmnElement="e_ini">
+        <dc:Bounds x="257" y="127" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="205" y="167" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_anota_di" bpmnElement="t_anota">
+        <dc:Bounds x="410" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_prio_di" bpmnElement="g_prio" isMarkerVisible="true">
+        <dc:Bounds x="670" y="320" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="625" y="374" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_alta_di" bpmnElement="t_alta" bioc:stroke="#e05252">
+        <dc:Bounds x="830" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_media_di" bpmnElement="t_media">
+        <dc:Bounds x="830" y="435" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_baja_di" bpmnElement="t_baja">
+        <dc:Bounds x="830" y="565" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_ayuda_di" bpmnElement="g_ayuda" isMarkerVisible="true">
+        <dc:Bounds x="1090" y="780" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1045" y="834" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_responde_di" bpmnElement="t_responde">
+        <dc:Bounds x="1250" y="765" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_arregla_di" bpmnElement="t_arregla">
+        <dc:Bounds x="1670" y="765" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_ok_di" bpmnElement="g_ok" isMarkerVisible="true">
+        <dc:Bounds x="1510" y="780" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1465" y="834" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_cierra_di" bpmnElement="t_cierra" bioc:stroke="#4d9e5c">
+        <dc:Bounds x="1670" y="895" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_aprende_di" bpmnElement="t_aprende">
+        <dc:Bounds x="1880" y="765" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_fin_di" bpmnElement="e_fin">
+        <dc:Bounds x="2147" y="787" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2095" y="827" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="d_sop_di" bpmnElement="d_sop">
+        <dc:Bounds x="677" y="120" width="36" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="625" y="174" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="sf_1_di" bpmnElement="sf_1">
+        <di:waypoint x="293" y="145"/>
+        <di:waypoint x="410" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_2_di" bpmnElement="sf_2">
+        <di:waypoint x="560" y="145"/>
+        <di:waypoint x="650" y="145"/>
+        <di:waypoint x="650" y="345"/>
+        <di:waypoint x="670" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_3_di" bpmnElement="sf_3">
+        <di:waypoint x="720" y="345"/>
+        <di:waypoint x="830" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_4_di" bpmnElement="sf_4">
+        <di:waypoint x="720" y="345"/>
+        <di:waypoint x="810" y="345"/>
+        <di:waypoint x="810" y="475"/>
+        <di:waypoint x="830" y="475"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_5_di" bpmnElement="sf_5">
+        <di:waypoint x="720" y="345"/>
+        <di:waypoint x="810" y="345"/>
+        <di:waypoint x="810" y="605"/>
+        <di:waypoint x="830" y="605"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_6_di" bpmnElement="sf_6">
+        <di:waypoint x="980" y="345"/>
+        <di:waypoint x="1070" y="345"/>
+        <di:waypoint x="1070" y="805"/>
+        <di:waypoint x="1090" y="805"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_7_di" bpmnElement="sf_7">
+        <di:waypoint x="980" y="475"/>
+        <di:waypoint x="1070" y="475"/>
+        <di:waypoint x="1070" y="805"/>
+        <di:waypoint x="1090" y="805"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_8_di" bpmnElement="sf_8">
+        <di:waypoint x="980" y="605"/>
+        <di:waypoint x="1070" y="605"/>
+        <di:waypoint x="1070" y="805"/>
+        <di:waypoint x="1090" y="805"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_9_di" bpmnElement="sf_9">
+        <di:waypoint x="1140" y="805"/>
+        <di:waypoint x="1250" y="805"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_10_di" bpmnElement="sf_10">
+        <di:waypoint x="1140" y="805"/>
+        <di:waypoint x="1670" y="805"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_11_di" bpmnElement="sf_11">
+        <di:waypoint x="1400" y="805"/>
+        <di:waypoint x="1510" y="805"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_12_di" bpmnElement="sf_12">
+        <di:waypoint x="1745" y="845"/>
+        <di:waypoint x="1745" y="1058"/>
+        <di:waypoint x="1535" y="1058"/>
+        <di:waypoint x="1535" y="830"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_13_di" bpmnElement="sf_13">
+        <di:waypoint x="1560" y="805"/>
+        <di:waypoint x="1670" y="805"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_14_di" bpmnElement="sf_14">
+        <di:waypoint x="1560" y="805"/>
+        <di:waypoint x="1650" y="805"/>
+        <di:waypoint x="1650" y="935"/>
+        <di:waypoint x="1670" y="935"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_15_di" bpmnElement="sf_15">
+        <di:waypoint x="1820" y="935"/>
+        <di:waypoint x="1860" y="935"/>
+        <di:waypoint x="1860" y="805"/>
+        <di:waypoint x="1880" y="805"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_16_di" bpmnElement="sf_16">
+        <di:waypoint x="2030" y="805"/>
+        <di:waypoint x="2147" y="805"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_1_di" bpmnElement="as_1">
+        <di:waypoint x="695" y="120"/>
+        <di:waypoint x="695" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="nota_1_di" bpmnElement="nota_1">
+        <dc:Bounds x="670" y="1110" width="230" height="104"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_2_di" bpmnElement="nota_2">
+        <dc:Bounds x="1250" y="1110" width="230" height="74"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_3_di" bpmnElement="nota_3">
+        <dc:Bounds x="1510" y="1110" width="230" height="74"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="as_nota_1_di" bpmnElement="as_nota_1">
+        <di:waypoint x="785" y="1110"/>
+        <di:waypoint x="695" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_2_di" bpmnElement="as_nota_2">
+        <di:waypoint x="1365" y="1110"/>
+        <di:waypoint x="1325" y="845"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_3_di" bpmnElement="as_nota_3">
+        <di:waypoint x="1625" y="1110"/>
+        <di:waypoint x="1535" y="830"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

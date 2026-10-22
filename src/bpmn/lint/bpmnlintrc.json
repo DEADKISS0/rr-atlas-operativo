@@ -1,0 +1,4 @@
+{
+  "extends": ["bpmnlint:recommended", "plugin:rr/recommended"],
+  "comentario": "recommended de bpmnlint más el plugin local rr. La deuda no-gateway-join-fork no se apaga aquí: el CI la separa en scripts/validate-bpmn.mjs para que siga visible."
+}

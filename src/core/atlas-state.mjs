@@ -26,10 +26,14 @@ export const NODE_COLORS = Object.freeze({
   mustard: '#ded116',
   orchid: '#973d8f',
   ink: '#070001',
-  moss: '#4f9d64',
-  blue: '#4568ff',
-  flag: '#c0442f',
+  paper: '#fffff3',
+  // Claves heredadas: el dato guardado se conserva y el hex entra a la paleta.
+  moss: '#973d8f',
+  blue: '#fffff3',
+  flag: '#be076d',
 });
+
+export const PALETTE_COLORS = Object.freeze(['fuchsia', 'mustard', 'orchid', 'ink', 'paper']);
 
 export const MEDIA_KINDS = Object.freeze([
   'auto',

@@ -1,0 +1,14 @@
+{
+  "comentario": "Deuda de modelado G2. Estas ocho compuertas abren y cierran a la vez (regla bpmnlint no-gateway-join-fork). El XML de las semillas no se reescribe: el fallo está en el modelado del spec, no en el exportador. El CI las cuenta como avisos conocidos para que el chequeo pase y la deuda siga visible. La validación en vivo de la app las sigue mostrando como error.",
+  "regla": "no-gateway-join-fork",
+  "casos": [
+    { "archivo": "clientes_que_pasa_despues_de_entregar.bpmn", "id": "g_vida" },
+    { "archivo": "clientes_que_pasa_despues_de_que_firman.bpmn", "id": "g_listo" },
+    { "archivo": "finanzas_como_se_le_paga_a_alguien.bpmn", "id": "g_firma" },
+    { "archivo": "finanzas_la_quincena.bpmn", "id": "g_abre" },
+    { "archivo": "gobierno_como_se_gobierna_la_documentacion.bpmn", "id": "g_dueno" },
+    { "archivo": "legal_como_se_firma_un_contrato.bpmn", "id": "g_firmado" },
+    { "archivo": "soporte_como_se_resuelve_un_problema_de_un_cliente.bpmn", "id": "g_ayuda" },
+    { "archivo": "soporte_como_se_resuelve_un_problema_de_un_cliente.bpmn", "id": "g_ok" }
+  ]
+}

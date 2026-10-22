@@ -1,0 +1,49 @@
+.atlas-bpmn-canvas {
+  --bio-primary: var(--rr-fuchsia);
+  --bio-focus: var(--rr-focus);
+  --accent-color: var(--rr-fuchsia);
+  --bjs-font-family: var(--rr-font-body);
+}
+.atlas-bpmn-canvas .djs-container,
+.atlas-bpmn-canvas .djs-container > svg { width: 100%; height: 100%; }
+.atlas-bpmn-canvas .djs-container { position: absolute; inset: 0; touch-action: none; background: var(--rr-canvas); }
+.atlas-bpmn-canvas .djs-visual text { font-family: var(--rr-font-body); font-size: 12px; }
+.atlas-bpmn-canvas .rr-lane-label,
+.atlas-bpmn-canvas .rr-lane-label tspan {
+  font-family: var(--rr-font-display);
+  letter-spacing: -.04em;
+  text-transform: uppercase;
+}
+.atlas-bpmn-canvas .djs-element.selected .djs-outline {
+  stroke: var(--rr-mustard);
+  stroke-width: 2px;
+}
+.atlas-bpmn-canvas .djs-element.selected .djs-visual {
+  filter: drop-shadow(3px 3px 0 var(--rr-ink-fixed));
+}
+.atlas-bpmn-canvas .djs-palette,
+.atlas-bpmn-canvas .djs-context-pad {
+  background: var(--rr-panel);
+  border: 1px solid var(--rr-orchid);
+  border-radius: 3px;
+}
+.atlas-bpmn-canvas .bjs-powered-by {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  left: auto !important;
+  right: 8px !important;
+  bottom: 8px !important;
+  max-width: calc(100% - 16px);
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px 6px;
+  background: var(--rr-paper-fixed);
+  border-radius: 3px;
+  opacity: 1 !important;
+}
+@media (max-width: 760px) {
+  .atlas-button--icon { width: 44px; min-width: 44px; min-height: 44px; }
+  .djs-palette .entry,
+  .djs-context-pad .entry { width: 44px; height: 44px; }
+}

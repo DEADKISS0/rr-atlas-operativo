@@ -1,5 +1,5 @@
-import { NODE_COLORS } from '../core/atlas-state.mjs?v=media-7';
-import { createMediaTile, isDirectMedia } from './atlas-media.mjs?v=media-7';
+import { NODE_COLORS } from '../core/atlas-state.mjs?v=bpmn-1';
+import { createMediaTile, isDirectMedia } from './atlas-media.mjs?v=bpmn-1';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -256,16 +256,20 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
     colorLabel.textContent = 'Color';
     const palette = document.createElement('div');
     palette.className = 'atlas-palette';
-    let selectedColor = node.color || 'fuchsia';
+    const colorAlias = { moss: 'orchid', blue: 'paper', flag: 'fuchsia' };
+    const originalColor = node.color || 'fuchsia';
+    let selectedColor = originalColor;
+    let palettePick = colorAlias[originalColor] || originalColor;
     for (const colorName of root.colors) {
       const swatch = button('', 'atlas-color-swatch');
       swatch.dataset.color = colorName;
-      swatch.title = colorName;
-      swatch.setAttribute('aria-label', `Usar color ${colorName}`);
+      swatch.title = root.colorLabels[colorName] ?? colorName;
       swatch.style.background = NODE_COLORS[colorName];
-      swatch.classList.toggle('is-active', colorName === selectedColor);
+      swatch.setAttribute('aria-label', `Usar color ${root.colorLabels[colorName] ?? colorName}`);
+      swatch.classList.toggle('is-active', colorName === palettePick);
       swatch.addEventListener('click', () => {
         selectedColor = colorName;
+        palettePick = colorName;
         palette.querySelectorAll('.atlas-color-swatch').forEach((item) => item.classList.toggle('is-active', item.dataset.color === colorName));
         updateAppearancePreview();
       });
@@ -440,7 +444,12 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
       return;
     }
     const start = { x: event.clientX, y: event.clientY, ox: viewport.x, oy: viewport.y };
-    const move = (next) => { viewport.x = start.ox + next.clientX - start.x; viewport.y = start.oy + next.clientY - start.y; setWorldTransform(); };
+    const move = (next) => {
+      if (pointers.size > 1) return;
+      viewport.x = start.ox + next.clientX - start.x;
+      viewport.y = start.oy + next.clientY - start.y;
+      setWorldTransform();
+    };
     const end = () => {
       root.work.removeEventListener('pointermove', move);
       root.work.removeEventListener('pointerup', end);
@@ -450,10 +459,39 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
     root.work.addEventListener('pointerup', end);
     root.work.addEventListener('pointercancel', end);
   };
-  root.work.addEventListener('pointerdown', pan);
+  const pointers = new Map();
+  let pinch = null;
+  const pinchDistance = () => {
+    const [a, b] = [...pointers.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y) || 1;
+  };
+  root.work.addEventListener('pointerdown', (event) => {
+    if (event.target.closest('button, input, textarea, select, a, .atlas-minimap')) return;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (pointers.size === 2) {
+      pinch = { distance: pinchDistance(), z: viewport.z };
+      return;
+    }
+    pan(event);
+  });
+  root.work.addEventListener('pointermove', (event) => {
+    if (!pointers.has(event.pointerId) || pointers.size < 2) return;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    event.preventDefault();
+    const distance = pinchDistance();
+    if (!pinch) pinch = { distance, z: viewport.z };
+    viewport.z = Math.max(.25, Math.min(2.4, pinch.z * (distance / pinch.distance)));
+    setWorldTransform();
+  }, { passive: false });
+  const releasePointer = (event) => {
+    pointers.delete(event.pointerId);
+    if (pointers.size < 2) pinch = null;
+  };
+  root.work.addEventListener('pointerup', releasePointer);
+  root.work.addEventListener('pointercancel', releasePointer);
   root.work.addEventListener('wheel', (event) => {
     event.preventDefault();
-    viewport.z = Math.max(.25, Math.min(2, viewport.z * (event.deltaY < 0 ? 1.1 : .9)));
+    viewport.z = Math.max(.25, Math.min(2.4, viewport.z * (event.deltaY < 0 ? 1.1 : .9)));
     setWorldTransform();
   }, { passive: false });
 

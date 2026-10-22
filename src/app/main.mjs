@@ -1,12 +1,14 @@
-import { STORAGE_KEY, createLocalRepository } from '../core/atlas-state.mjs?v=media-7';
-import { DEFAULT_GRAPH } from '../data/default-graph.mjs?v=media-7';
-import { KNOWN_LINKS } from '../data/known-links.mjs?v=media-7';
-import { createAtlasStore, DEFAULT_TYPES } from './atlas-store.mjs?v=media-7';
-import { NODE_COLORS, NODE_SHAPES, MEDIA_KINDS } from '../core/atlas-state.mjs?v=media-7';
-import { createAtlasShell } from '../ui/atlas-shell.mjs?v=media-7';
-import { createAtlasView } from '../ui/atlas-view.mjs?v=media-7';
-import { createMediaFrame } from '../ui/atlas-media.mjs?v=media-7';
-import { bindAtlasEvents } from '../ui/atlas-events.mjs?v=media-7';
+import { STORAGE_KEY, createLocalRepository, PALETTE_COLORS } from '../core/atlas-state.mjs?v=bpmn-1';
+import { DEFAULT_GRAPH } from '../data/default-graph.mjs?v=bpmn-1';
+import { KNOWN_LINKS } from '../data/known-links.mjs?v=bpmn-1';
+import { createAtlasStore, DEFAULT_TYPES } from './atlas-store.mjs?v=bpmn-1';
+import { NODE_SHAPES, MEDIA_KINDS } from '../core/atlas-state.mjs?v=bpmn-1';
+import { createAtlasShell } from '../ui/atlas-shell.mjs?v=bpmn-1';
+import { createAtlasView } from '../ui/atlas-view.mjs?v=bpmn-1';
+import { createMediaFrame } from '../ui/atlas-media.mjs?v=bpmn-1';
+import { bindAtlasEvents } from '../ui/atlas-events.mjs?v=bpmn-1';
+import { createProcessView } from '../ui/atlas-process-view.mjs?v=bpmn-1';
+import { bindAtlasNavigation } from '../ui/atlas-nav.mjs?v=bpmn-1';
 
 const rootElement = document.querySelector('#atlas-app');
 const layout = rootElement.querySelector('[data-atlas-layout]');
@@ -40,15 +42,16 @@ const root = {
     hexagon: 'Hexágono',
     note: 'Nota',
   },
-  colors: Object.keys(NODE_COLORS),
+  colors: PALETTE_COLORS,
   colorLabels: {
     fuchsia: 'Fucsia',
     mustard: 'Mostaza',
     orchid: 'Orquídea',
     ink: 'Negro',
-    moss: 'Verde',
-    blue: 'Azul',
-    flag: 'Rojo bandera',
+    paper: 'Blanco',
+    moss: 'Orquídea',
+    blue: 'Blanco',
+    flag: 'Fucsia',
   },
   mediaKinds: MEDIA_KINDS,
   railButtons: [...rootElement.querySelectorAll('[data-atlas-filter]')],
@@ -109,6 +112,7 @@ const applyTheme = (mode) => {
   root.theme.label.textContent = light ? 'Tema RR claro' : 'Tema RR oscuro';
   root.theme.toggle.setAttribute('aria-pressed', String(light));
   root.theme.toggle.title = light ? 'Cambiar a tema oscuro' : 'Cambiar a tema claro';
+  document.dispatchEvent(new CustomEvent('atlas-theme', { detail: { mode } }));
 };
 
 const savedTheme = window.localStorage.getItem('rr-atlas-theme') === 'light' ? 'light' : 'dark';
@@ -148,4 +152,6 @@ const view = createAtlasView({
 });
 
 bindAtlasEvents({ root, store, view, knownLinks: KNOWN_LINKS, onToast: toast, applyTheme });
+const processView = createProcessView({ app: rootElement, onToast: toast });
+bindAtlasNavigation({ app: rootElement, search: root.search, processView });
 store.subscribe((snapshot) => view.render(snapshot));

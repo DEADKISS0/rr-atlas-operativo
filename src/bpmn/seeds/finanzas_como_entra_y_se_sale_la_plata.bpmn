@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="def_flujo_finanzas" targetNamespace="https://rraliados.co/bpmn" exporter="RR Aliados · bpmn_xml_v2.py" exporterVersion="2.0">
+  <bpmn:collaboration id="collab_1">
+    <bpmn:participant id="part_1" name="CÓMO ENTRA Y SE SALE LA PLATA" processRef="proc_flujo_finanzas"/>
+  </bpmn:collaboration>
+  <bpmn:process id="proc_flujo_finanzas" name="CÓMO ENTRA Y SE SALE LA PLATA" isExecutable="false">
+    <bpmn:documentation>CÓMO ENTRA Y SE SALE LA PLATA
+La plata entra por un lado, sale por otro, y hay una ventana de 15 días donde no entra casi nada. · corte 2026-09-26
+Dueno del proceso: DESCONOCIDO (el spec no lo declara)
+KPI: DESCONOCIDO (el spec no lo declara)
+Fuente: _herramientas/esquemas_bpmn/finanzas_como_entra_y_se_sale_la_plata.json</bpmn:documentation>
+    <bpmn:laneSet id="laneset_1">
+      <bpmn:lane id="lane_1" name="1 · Cobrar">
+        <bpmn:flowNodeRef>e_ini</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_cotiza</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_escrito</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_emite</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_entra</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_2" name="2 · Registrar">
+        <bpmn:flowNodeRef>g_cuadra</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_revisa</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_anota</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_espejo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_persigue</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_informa</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>e_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_3" name="3 · La ventana de caja"/>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="e_ini" name="El cliente pide">
+      <bpmn:outgoing>sf_1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="ed_e_ini"/>
+    </bpmn:startEvent>
+    <bpmn:task id="t_cotiza" name="1. Cotiza o acuerdo">
+      <bpmn:documentation>El cliente pide algo. Hay que ponerle precio.</bpmn:documentation>
+      <bpmn:incoming>sf_1</bpmn:incoming>
+      <bpmn:outgoing>sf_2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_escrito" name="2. Se pone por escrito">
+      <bpmn:documentation>Contrato o soporte. Sin esto no se cobra.</bpmn:documentation>
+      <bpmn:incoming>sf_2</bpmn:incoming>
+      <bpmn:outgoing>sf_3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_emite" name="3. Se emite la cuenta">
+      <bpmn:documentation>La factura o Cuenta de Cobro al cliente.</bpmn:documentation>
+      <bpmn:incoming>sf_3</bpmn:incoming>
+      <bpmn:outgoing>sf_4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_entra" name="4. Entra la plata">
+      <bpmn:documentation>El cliente paga. CLIENTE_C entra [CIFRA] cada mes.</bpmn:documentation>
+      <bpmn:incoming>sf_4</bpmn:incoming>
+      <bpmn:outgoing>sf_5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g_cuadra" name="5. ¿Cuadra lo que entró?">
+      <bpmn:incoming>sf_5</bpmn:incoming>
+      <bpmn:outgoing>sf_6</bpmn:outgoing>
+      <bpmn:outgoing>sf_7</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="t_revisa" name="Se revisa que cuadre">
+      <bpmn:documentation>Se comprueba que la plata es la que debía.</bpmn:documentation>
+      <bpmn:incoming>sf_6</bpmn:incoming>
+      <bpmn:outgoing>sf_8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_anota" name="6. Se anota">
+      <bpmn:documentation>Todo va a captura.json. En ningún otro archivo.</bpmn:documentation>
+      <bpmn:incoming>sf_8</bpmn:incoming>
+      <bpmn:outgoing>sf_9</bpmn:outgoing>
+      <bpmn:property id="prop_t_anota" name="__targetRef_placeholder"/>
+      <bpmn:dataInputAssociation id="dia_1">
+        <bpmn:documentation>los números</bpmn:documentation>
+        <bpmn:sourceRef>d_fuente</bpmn:sourceRef>
+        <bpmn:targetRef>prop_t_anota</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:task id="t_espejo" name="7. Se sube al espejo">
+      <bpmn:documentation>sync_corte.py lo publica. El tablero solo muestra: nunca se edita a mano.</bpmn:documentation>
+      <bpmn:incoming>sf_9</bpmn:incoming>
+      <bpmn:outgoing>sf_12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_persigue" name="8. Se persigue lo que falta">
+      <bpmn:documentation>Quién debe y desde cuándo. Cartera vencida hoy: [CIFRA]</bpmn:documentation>
+      <bpmn:incoming>sf_7</bpmn:incoming>
+      <bpmn:outgoing>sf_10</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_informa" name="9. Se informa">
+      <bpmn:documentation>Reporte semanal de cartera.</bpmn:documentation>
+      <bpmn:incoming>sf_10</bpmn:incoming>
+      <bpmn:incoming>sf_12</bpmn:incoming>
+      <bpmn:outgoing>sf_11</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="e_fin" name="Cerrado el ciclo">
+      <bpmn:incoming>sf_11</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:dataObject id="do_d_ventana"/>
+    <bpmn:dataObjectReference id="d_ventana" dataObjectRef="do_d_ventana" name="La ventana de 15 días">
+      <bpmn:documentation>27/09 caja en cero · 30/09 -[CIFRA] · 14/10 -[CIFRA] · 15/10 entra CLIENTE_A. Del 16/02 el colchón es [CIFRA] y sin CLIENTE_A son -[CIFRA]/mes: se acaba en julio 2027.</bpmn:documentation>
+    </bpmn:dataObjectReference>
+    <bpmn:dataStoreReference id="d_fuente" name="captura.json">
+      <bpmn:documentation>Almacén · la única fuente de los números.</bpmn:documentation>
+    </bpmn:dataStoreReference>
+    <bpmn:sequenceFlow id="sf_1" sourceRef="e_ini" targetRef="t_cotiza"/>
+    <bpmn:sequenceFlow id="sf_2" sourceRef="t_cotiza" targetRef="t_escrito" name="se formaliza"/>
+    <bpmn:sequenceFlow id="sf_3" sourceRef="t_escrito" targetRef="t_emite" name="se factura"/>
+    <bpmn:sequenceFlow id="sf_4" sourceRef="t_emite" targetRef="t_entra"/>
+    <bpmn:sequenceFlow id="sf_5" sourceRef="t_entra" targetRef="g_cuadra"/>
+    <bpmn:sequenceFlow id="sf_6" sourceRef="g_cuadra" targetRef="t_revisa" name="sí"/>
+    <bpmn:sequenceFlow id="sf_7" sourceRef="g_cuadra" targetRef="t_persigue" name="no: falta plata"/>
+    <bpmn:sequenceFlow id="sf_8" sourceRef="t_revisa" targetRef="t_anota"/>
+    <bpmn:sequenceFlow id="sf_9" sourceRef="t_anota" targetRef="t_espejo" name="se publica"/>
+    <bpmn:sequenceFlow id="sf_10" sourceRef="t_persigue" targetRef="t_informa"/>
+    <bpmn:sequenceFlow id="sf_11" sourceRef="t_informa" targetRef="e_fin"/>
+    <bpmn:sequenceFlow id="sf_12" sourceRef="t_espejo" targetRef="t_informa" name="y se reporta"/>
+    <bpmn:association id="as_1" sourceRef="d_ventana" targetRef="g_cuadra" associationDirection="One">
+      <bpmn:documentation>el riesgo</bpmn:documentation>
+    </bpmn:association>
+    <bpmn:textAnnotation id="nota_1">
+      <bpmn:text>REGLA ROJA: cobrar antes de firmar es el error más caro que hay. Acá se pierde plata.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_1" sourceRef="nota_1" targetRef="t_emite"/>
+    <bpmn:textAnnotation id="nota_2">
+      <bpmn:text>Corrección 2026-09-26: este paso decía «3 de 17 Cuentas de Cobro sin firmar por [CIFRA]». Esas 20 Cuentas de Cobro son cuentas POR PAGAR a colaboradores, no cartera de clientes. La cartera vencida de RR Aliados es [CIFRA] Ver 03_09_flujo_pago_colaborador.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_2" sourceRef="nota_2" targetRef="t_persigue"/>
+    <bpmn:textAnnotation id="nota_3">
+      <bpmn:text>LA BOMBA REAL NO ES OCTUBRE, ES MARZO DE 2027. CLIENTE_A paga hasta el 15/02/2027 y CLIENTE_C hasta el 30/01/2027 (captura.json, corte 2026-09-26). DESPUES de esas fechas entra 0 y salen [CIFRA] al mes (burn [CIFRA] + ARL [CIFRA] + IA [CIFRA] + tarjeta [CIFRA]). El burn no se puede reducir. Hay que decidirlo antes, no en marzo.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_3" sourceRef="nota_3" targetRef="d_ventana"/>
+    <bpmn:textAnnotation id="nota_4">
+      <bpmn:text>A quién se le pregunta: Legal por el contrato, Dirección por la aprobación.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_4" sourceRef="nota_4" targetRef="t_espejo"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="diagrama_1">
+    <bpmndi:BPMNPlane id="plano_1" bpmnElement="collab_1">
+      <bpmndi:BPMNShape id="part_1_di" bpmnElement="part_1" isHorizontal="true">
+        <dc:Bounds x="100" y="80" width="2430" height="730"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_1_di" bpmnElement="lane_1" isHorizontal="true">
+        <dc:Bounds x="130" y="80" width="2400" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_2_di" bpmnElement="lane_2" isHorizontal="true">
+        <dc:Bounds x="130" y="280" width="2400" height="330"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_3_di" bpmnElement="lane_3" isHorizontal="true">
+        <dc:Bounds x="130" y="610" width="2400" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_ini_di" bpmnElement="e_ini">
+        <dc:Bounds x="257" y="127" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="205" y="167" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_cotiza_di" bpmnElement="t_cotiza">
+        <dc:Bounds x="410" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_escrito_di" bpmnElement="t_escrito">
+        <dc:Bounds x="620" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_emite_di" bpmnElement="t_emite">
+        <dc:Bounds x="830" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_entra_di" bpmnElement="t_entra" bioc:stroke="#4d9e5c">
+        <dc:Bounds x="1040" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_cuadra_di" bpmnElement="g_cuadra" isMarkerVisible="true">
+        <dc:Bounds x="1300" y="320" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1255" y="374" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_revisa_di" bpmnElement="t_revisa">
+        <dc:Bounds x="1460" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_anota_di" bpmnElement="t_anota">
+        <dc:Bounds x="1670" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_espejo_di" bpmnElement="t_espejo">
+        <dc:Bounds x="1880" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_persigue_di" bpmnElement="t_persigue">
+        <dc:Bounds x="1460" y="435" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_informa_di" bpmnElement="t_informa">
+        <dc:Bounds x="2090" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_fin_di" bpmnElement="e_fin">
+        <dc:Bounds x="2357" y="327" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2305" y="367" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="d_ventana_di" bpmnElement="d_ventana">
+        <dc:Bounds x="1307" y="650" width="36" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1255" y="704" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="d_fuente_di" bpmnElement="d_fuente">
+        <dc:Bounds x="1720" y="650" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1675" y="704" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="sf_1_di" bpmnElement="sf_1">
+        <di:waypoint x="293" y="145"/>
+        <di:waypoint x="410" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_2_di" bpmnElement="sf_2">
+        <di:waypoint x="560" y="145"/>
+        <di:waypoint x="620" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_3_di" bpmnElement="sf_3">
+        <di:waypoint x="770" y="145"/>
+        <di:waypoint x="830" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_4_di" bpmnElement="sf_4">
+        <di:waypoint x="980" y="145"/>
+        <di:waypoint x="1040" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_5_di" bpmnElement="sf_5">
+        <di:waypoint x="1190" y="145"/>
+        <di:waypoint x="1280" y="145"/>
+        <di:waypoint x="1280" y="345"/>
+        <di:waypoint x="1300" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_6_di" bpmnElement="sf_6">
+        <di:waypoint x="1350" y="345"/>
+        <di:waypoint x="1460" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_7_di" bpmnElement="sf_7">
+        <di:waypoint x="1350" y="345"/>
+        <di:waypoint x="1440" y="345"/>
+        <di:waypoint x="1440" y="475"/>
+        <di:waypoint x="1460" y="475"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_8_di" bpmnElement="sf_8">
+        <di:waypoint x="1610" y="345"/>
+        <di:waypoint x="1670" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_9_di" bpmnElement="sf_9">
+        <di:waypoint x="1820" y="345"/>
+        <di:waypoint x="1880" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_10_di" bpmnElement="sf_10">
+        <di:waypoint x="1610" y="475"/>
+        <di:waypoint x="2070" y="475"/>
+        <di:waypoint x="2070" y="345"/>
+        <di:waypoint x="2090" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_11_di" bpmnElement="sf_11">
+        <di:waypoint x="2240" y="345"/>
+        <di:waypoint x="2357" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_12_di" bpmnElement="sf_12">
+        <di:waypoint x="2030" y="345"/>
+        <di:waypoint x="2090" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="dia_1_di" bpmnElement="dia_1">
+        <di:waypoint x="1745" y="650"/>
+        <di:waypoint x="1745" y="385"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_1_di" bpmnElement="as_1">
+        <di:waypoint x="1325" y="650"/>
+        <di:waypoint x="1325" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="nota_1_di" bpmnElement="nota_1">
+        <dc:Bounds x="830" y="850" width="230" height="59"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_2_di" bpmnElement="nota_2">
+        <dc:Bounds x="1561" y="850" width="230" height="119"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_3_di" bpmnElement="nota_3">
+        <dc:Bounds x="1307" y="850" width="230" height="149"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_4_di" bpmnElement="nota_4">
+        <dc:Bounds x="1880" y="850" width="230" height="59"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="as_nota_1_di" bpmnElement="as_nota_1">
+        <di:waypoint x="945" y="850"/>
+        <di:waypoint x="905" y="185"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_2_di" bpmnElement="as_nota_2">
+        <di:waypoint x="1676" y="850"/>
+        <di:waypoint x="1535" y="515"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_3_di" bpmnElement="as_nota_3">
+        <di:waypoint x="1422" y="850"/>
+        <di:waypoint x="1325" y="700"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_4_di" bpmnElement="as_nota_4">
+        <di:waypoint x="1995" y="850"/>
+        <di:waypoint x="1955" y="385"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

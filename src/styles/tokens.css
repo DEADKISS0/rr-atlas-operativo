@@ -2,13 +2,15 @@
   --rr-fuchsia: #be076d;
   --rr-mustard: #ded116;
   --rr-orchid: #973d8f;
-  --rr-ink: #070001;
-  --rr-paper: #fffff3;
+  --rr-ink-fixed: #070001;
+  --rr-paper-fixed: #fffff3;
+  --rr-ink: var(--rr-ink-fixed);
+  --rr-paper: var(--rr-paper-fixed);
   --rr-panel: #150612;
   --rr-card: #200b1b;
   --rr-muted: #d2abc2;
-  --rr-border: #973d8f;
-  --rr-shadow: 7px 7px 0 var(--rr-ink);
+  --rr-border: var(--rr-orchid);
+  --rr-shadow: 7px 7px 0 var(--rr-ink-fixed);
   --rr-radius: 3px;
   --rr-space-1: 4px;
   --rr-space-2: 8px;
@@ -16,40 +18,89 @@
   --rr-space-4: 16px;
   --rr-space-5: 24px;
   --rr-space-6: 32px;
-  --rr-font: "Arial Nova", "Helvetica Neue", Arial, sans-serif;
+  /* Neue Haas Grotesk y Graphie cuando Dirección entregue la licencia web. */
+  --rr-font-display: "Neue Haas Grotesk", "Arial Nova", "Helvetica Neue", Arial, sans-serif;
+  --rr-font-body: "Graphie", "Arial Nova", "Helvetica Neue", Arial, sans-serif;
+  --rr-font: var(--rr-font-body);
   --rr-bezel: #0b0108;
   --rr-well: #11020c;
+  --rr-rail: #11020c;
+  --rr-canvas: #0e030b;
+  --rr-input: #180612;
+  --rr-button: #260a20;
+  --rr-button-hover: #41102c;
+  --rr-status: #1b0918;
+  --rr-sidebar: #150613;
   --rr-hairline: rgba(255, 255, 255, .16);
   --rr-panel-shadow: 0 1px 2px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .05), 0 0 0 1px rgba(255, 255, 255, .05);
+  --rr-dot: #973d8f73;
+  --rr-accent-text: var(--rr-mustard);
+  --rr-focus: var(--rr-mustard);
+  --rr-bpmn-base-stroke: var(--rr-paper-fixed);
+  --rr-bpmn-base-fill: var(--rr-panel);
+  --rr-bpmn-attention: var(--rr-mustard);
+  --rr-bpmn-alarm: var(--rr-fuchsia);
+  --rr-bpmn-lane: var(--rr-orchid);
+  --rr-bpmn-muted: var(--rr-muted);
+  --rr-bpmn-text: var(--rr-paper-fixed);
+  --rr-bpmn-end: var(--rr-paper-fixed);
+  --rr-tabbar: 0px;
 }
 
 body.atlas-theme-light {
-  --rr-ink: #f5f5ef;
-  --rr-paper: #171714;
-  --rr-panel: #ffffff;
-  --rr-card: #ffffff;
+  --rr-ink: var(--rr-paper-fixed);
+  --rr-paper: var(--rr-ink-fixed);
+  --rr-panel: var(--rr-paper-fixed);
+  --rr-card: var(--rr-paper-fixed);
   --rr-muted: #62625b;
-  --rr-border: #d4d4cc;
-  --rr-orchid: #b4a3b2;
-  --rr-shadow: 6px 6px 0 #d7d7ce;
-  --rr-bezel: #f1f1eb;
+  --rr-border: var(--rr-orchid);
+  --rr-shadow: 4px 4px 0 rgba(7, 0, 1, .18);
+  --rr-bezel: var(--rr-paper-fixed);
   --rr-well: #e9e9e2;
-  --rr-hairline: rgba(0, 0, 0, .14);
-  --rr-panel-shadow: 0 1px 2px rgba(28, 25, 23, .06), 0 0 0 1px rgba(28, 25, 23, .11);
+  --rr-rail: var(--rr-paper-fixed);
+  --rr-canvas: var(--rr-paper-fixed);
+  --rr-input: var(--rr-paper-fixed);
+  --rr-button: var(--rr-paper-fixed);
+  --rr-button-hover: #f3f3ea;
+  --rr-status: var(--rr-paper-fixed);
+  --rr-sidebar: var(--rr-paper-fixed);
+  --rr-hairline: rgba(7, 0, 1, .14);
+  --rr-panel-shadow: 0 1px 2px rgba(7, 0, 1, .08), 0 0 0 1px rgba(7, 0, 1, .12);
+  --rr-dot: #973d8f55;
+  --rr-accent-text: var(--rr-orchid);
+  --rr-focus: var(--rr-orchid);
+  --rr-bpmn-base-stroke: var(--rr-ink-fixed);
+  --rr-bpmn-base-fill: var(--rr-paper-fixed);
+  --rr-bpmn-attention: var(--rr-orchid);
+  --rr-bpmn-alarm: var(--rr-fuchsia);
+  --rr-bpmn-lane: var(--rr-orchid);
+  --rr-bpmn-muted: var(--rr-ink-fixed);
+  --rr-bpmn-text: var(--rr-ink-fixed);
+  --rr-bpmn-end: var(--rr-ink-fixed);
 }
 
 * { box-sizing: border-box; }
-html, body { min-height: 100%; }
+[hidden] { display: none !important; }
+html, body { height: 100%; max-width: 100%; }
 body {
   margin: 0;
+  overflow: hidden;
   background: var(--rr-bezel);
   color: var(--rr-paper);
-  font-family: var(--rr-font);
+  font-family: var(--rr-font-body);
   font-size: 14px;
 }
+h1, h2, h3, .atlas-brand strong { font-family: var(--rr-font-display); letter-spacing: -.04em; }
 button, input, textarea, select { font: inherit; }
 button { cursor: pointer; }
-button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
-  outline: 2px solid var(--rr-mustard);
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, a:focus-visible {
+  outline: 2px solid var(--rr-focus);
   outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }

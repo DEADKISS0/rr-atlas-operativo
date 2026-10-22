@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="def_flujo_onboarding_cliente" targetNamespace="https://rraliados.co/bpmn" exporter="RR Aliados · bpmn_xml_v2.py" exporterVersion="2.0">
+  <bpmn:collaboration id="collab_1">
+    <bpmn:participant id="part_1" name="QUÉ PASA DESPUÉS DE QUE FIRMAN" processRef="proc_flujo_onboarding_cliente"/>
+  </bpmn:collaboration>
+  <bpmn:process id="proc_flujo_onboarding_cliente" name="QUÉ PASA DESPUÉS DE QUE FIRMAN" isExecutable="false">
+    <bpmn:documentation>QUÉ PASA DESPUÉS DE QUE FIRMAN
+Etapa 07 del embudo. Del contrato firmado al primer entregable. · corte 2026-09-26
+Dueno del proceso: DESCONOCIDO (el spec no lo declara)
+KPI: DESCONOCIDO (el spec no lo declara)
+Fuente: _herramientas/esquemas_bpmn/clientes_que_pasa_despues_de_que_firman.json</bpmn:documentation>
+    <bpmn:laneSet id="laneset_1">
+      <bpmn:lane id="lane_1" name="1 · Antes de empezar">
+        <bpmn:flowNodeRef>e_ini</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_confirma</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_anticipo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_listo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_espera</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_2" name="2 · Los primeros días">
+        <bpmn:flowNodeRef>t_reunion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_calendario</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_entregable</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>e_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="e_ini" name="Contrato firmado">
+      <bpmn:outgoing>sf_1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="ed_e_ini"/>
+    </bpmn:startEvent>
+    <bpmn:task id="t_confirma" name="1. Confirmar que firmó">
+      <bpmn:documentation>No basta con el PDF. CLIENTE_A y CLIENTE_C no tienen contrato firmado: sin esa firma no hay factura que emitir, y el 15/10 se esperan [CIFRA].</bpmn:documentation>
+      <bpmn:incoming>sf_1</bpmn:incoming>
+      <bpmn:outgoing>sf_2</bpmn:outgoing>
+      <bpmn:property id="prop_t_confirma" name="__targetRef_placeholder"/>
+      <bpmn:dataInputAssociation id="dia_1">
+        <bpmn:documentation>la etapa 07</bpmn:documentation>
+        <bpmn:sourceRef>d_ventas</bpmn:sourceRef>
+        <bpmn:targetRef>prop_t_confirma</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:task id="t_anticipo" name="2. Cobrar el primer anticipo">
+      <bpmn:documentation>La factura se emite y se cobra antes de empezar. CLIENTE_A: [CIFRA] el 15/10. CLIENTE_C: [CIFRA]/mes. Hoy no hay anticipo cobrado.</bpmn:documentation>
+      <bpmn:incoming>sf_2</bpmn:incoming>
+      <bpmn:outgoing>sf_3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g_listo" name="¿Ya con plata?">
+      <bpmn:incoming>sf_3</bpmn:incoming>
+      <bpmn:incoming>sf_6</bpmn:incoming>
+      <bpmn:outgoing>sf_4</bpmn:outgoing>
+      <bpmn:outgoing>sf_5</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="t_espera" name="Se espera el pago">
+      <bpmn:documentation>Sin anticipo no se arranca: empezar a producir sin cobrar es la forma más rápida de perder plata.</bpmn:documentation>
+      <bpmn:incoming>sf_4</bpmn:incoming>
+      <bpmn:outgoing>sf_6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_reunion" name="3. Reunión de arranque">
+      <bpmn:documentation>Qué quiere, para qué, cuándo lo necesita. Se escribe. Es la etapa 04 del manual de roles: reunión de inicio.</bpmn:documentation>
+      <bpmn:incoming>sf_5</bpmn:incoming>
+      <bpmn:outgoing>sf_7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_calendario" name="4. Calendario de contenido">
+      <bpmn:documentation>Etapa 08 del embudo: qué se publica y cuándo. Con CLIENTE_A ya existe: 4 pagos mensuales, de nov a feb.</bpmn:documentation>
+      <bpmn:incoming>sf_7</bpmn:incoming>
+      <bpmn:outgoing>sf_8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_entregable" name="5. Primer entregable">
+      <bpmn:documentation>Algo pequeño y rápido para mostrar que arranca. La aprobación del cliente es el paso 4 del esquema de producción.</bpmn:documentation>
+      <bpmn:incoming>sf_8</bpmn:incoming>
+      <bpmn:outgoing>sf_9</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="e_fin" name="Onboarding hecho">
+      <bpmn:incoming>sf_9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:dataObject id="do_d_ventas"/>
+    <bpmn:dataObjectReference id="d_ventas" dataObjectRef="do_d_ventas" name="ventas.md">
+      <bpmn:documentation>El embudo de 13 etapas. Esta es la etapa 07.</bpmn:documentation>
+    </bpmn:dataObjectReference>
+    <bpmn:sequenceFlow id="sf_1" sourceRef="e_ini" targetRef="t_confirma"/>
+    <bpmn:sequenceFlow id="sf_2" sourceRef="t_confirma" targetRef="t_anticipo"/>
+    <bpmn:sequenceFlow id="sf_3" sourceRef="t_anticipo" targetRef="g_listo"/>
+    <bpmn:sequenceFlow id="sf_4" sourceRef="g_listo" targetRef="t_espera" name="no"/>
+    <bpmn:sequenceFlow id="sf_5" sourceRef="g_listo" targetRef="t_reunion" name="sí: ya con plata"/>
+    <bpmn:sequenceFlow id="sf_6" sourceRef="t_espera" targetRef="g_listo" name="llegó el pago"/>
+    <bpmn:sequenceFlow id="sf_7" sourceRef="t_reunion" targetRef="t_calendario"/>
+    <bpmn:sequenceFlow id="sf_8" sourceRef="t_calendario" targetRef="t_entregable"/>
+    <bpmn:sequenceFlow id="sf_9" sourceRef="t_entregable" targetRef="e_fin"/>
+    <bpmn:textAnnotation id="nota_1">
+      <bpmn:text>El cliente nuevo no tiene guía: de los 11 clientes con ficha, ninguno tiene un documento de qué se le pide al entrar, en qué orden, ni quién lo coordina.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_1" sourceRef="nota_1" targetRef="t_reunion"/>
+    <bpmn:textAnnotation id="nota_2">
+      <bpmn:text>Lo que sí está escrito: la reunión de inicio (etapa 04) y el calendario de contenido (etapa 08). Existen. Lo que no existe es el proceso que las une.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_2" sourceRef="nota_2" targetRef="t_calendario"/>
+    <bpmn:textAnnotation id="nota_3">
+      <bpmn:text>CLIENTE_A es el ejemplo y el riesgo: [CIFRA] el 15/10 y [CIFRA] al mes de nov a feb, con el contrato sin firmar. Es el cliente más grande y el único con el proceso medio descrito.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_3" sourceRef="nota_3" targetRef="t_confirma"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="diagrama_1">
+    <bpmndi:BPMNPlane id="plano_1" bpmnElement="collab_1">
+      <bpmndi:BPMNShape id="part_1_di" bpmnElement="part_1" isHorizontal="true">
+        <dc:Bounds x="100" y="80" width="1800" height="400"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_1_di" bpmnElement="lane_1" isHorizontal="true">
+        <dc:Bounds x="130" y="80" width="1770" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_2_di" bpmnElement="lane_2" isHorizontal="true">
+        <dc:Bounds x="130" y="280" width="1770" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_ini_di" bpmnElement="e_ini">
+        <dc:Bounds x="257" y="127" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="205" y="167" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_confirma_di" bpmnElement="t_confirma" bioc:stroke="#e05252">
+        <dc:Bounds x="410" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_anticipo_di" bpmnElement="t_anticipo">
+        <dc:Bounds x="620" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_listo_di" bpmnElement="g_listo" isMarkerVisible="true">
+        <dc:Bounds x="880" y="120" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="835" y="174" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_espera_di" bpmnElement="t_espera" bioc:stroke="#e08b45">
+        <dc:Bounds x="1040" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_reunion_di" bpmnElement="t_reunion">
+        <dc:Bounds x="1040" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_calendario_di" bpmnElement="t_calendario">
+        <dc:Bounds x="1250" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_entregable_di" bpmnElement="t_entregable" bioc:stroke="#4d9e5c">
+        <dc:Bounds x="1460" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_fin_di" bpmnElement="e_fin">
+        <dc:Bounds x="1727" y="327" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1675" y="367" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="d_ventas_di" bpmnElement="d_ventas">
+        <dc:Bounds x="467" y="320" width="36" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="415" y="374" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="sf_1_di" bpmnElement="sf_1">
+        <di:waypoint x="293" y="145"/>
+        <di:waypoint x="410" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_2_di" bpmnElement="sf_2">
+        <di:waypoint x="560" y="145"/>
+        <di:waypoint x="620" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_3_di" bpmnElement="sf_3">
+        <di:waypoint x="770" y="145"/>
+        <di:waypoint x="880" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_4_di" bpmnElement="sf_4">
+        <di:waypoint x="930" y="145"/>
+        <di:waypoint x="1040" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_5_di" bpmnElement="sf_5">
+        <di:waypoint x="930" y="145"/>
+        <di:waypoint x="1020" y="145"/>
+        <di:waypoint x="1020" y="345"/>
+        <di:waypoint x="1040" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_6_di" bpmnElement="sf_6">
+        <di:waypoint x="1115" y="185"/>
+        <di:waypoint x="1115" y="268"/>
+        <di:waypoint x="905" y="268"/>
+        <di:waypoint x="905" y="170"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_7_di" bpmnElement="sf_7">
+        <di:waypoint x="1190" y="345"/>
+        <di:waypoint x="1250" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_8_di" bpmnElement="sf_8">
+        <di:waypoint x="1400" y="345"/>
+        <di:waypoint x="1460" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_9_di" bpmnElement="sf_9">
+        <di:waypoint x="1610" y="345"/>
+        <di:waypoint x="1727" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="dia_1_di" bpmnElement="dia_1">
+        <di:waypoint x="485" y="320"/>
+        <di:waypoint x="485" y="185"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="nota_1_di" bpmnElement="nota_1">
+        <dc:Bounds x="1040" y="520" width="230" height="89"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_2_di" bpmnElement="nota_2">
+        <dc:Bounds x="1294" y="520" width="230" height="89"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_3_di" bpmnElement="nota_3">
+        <dc:Bounds x="410" y="520" width="230" height="89"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="as_nota_1_di" bpmnElement="as_nota_1">
+        <di:waypoint x="1155" y="520"/>
+        <di:waypoint x="1115" y="385"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_2_di" bpmnElement="as_nota_2">
+        <di:waypoint x="1409" y="520"/>
+        <di:waypoint x="1325" y="385"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_3_di" bpmnElement="as_nota_3">
+        <di:waypoint x="525" y="520"/>
+        <di:waypoint x="485" y="185"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
