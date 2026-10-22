@@ -1,5 +1,5 @@
-import { NODE_COLORS } from '../core/atlas-state.mjs?v=bpmn-2';
-import { createMediaTile, isDirectMedia } from './atlas-media.mjs?v=bpmn-2';
+import { NODE_COLORS } from '../core/atlas-state.mjs?v=bpmn-3';
+import { createMediaTile, isDirectMedia } from './atlas-media.mjs?v=bpmn-3';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -27,7 +27,7 @@ function sectionHeading(text) {
   return heading;
 }
 
-export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, onMediaOpen, onToast }) {
+export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, onMediaOpen, onToast, onInspect }) {
   const viewport = { x: 60, y: 50, z: 0.72 };
   let moving = null;
   let connecting = null;
@@ -36,7 +36,7 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
   let wiresVisible = true;
   let currentSnapshot = store.getSnapshot();
 
-  const toast = (message) => onToast?.(message);
+  const toast = (message, options) => onToast?.(message, options);
   const getNode = (id) => currentSnapshot.state.data.find((node) => node.id === id) ?? null;
   const effectiveNode = (node) => {
     if (!node || !appearancePreview || appearancePreview.id !== node.id) return node;
@@ -61,8 +61,33 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
     });
   };
 
+  let motionToken = 0;
+  const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const setWorldTransform = () => {
     root.world.style.transform = `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.z})`;
+  };
+  const animateViewport = (next) => {
+    const token = ++motionToken;
+    if (reducedMotion()) {
+      viewport.x = next.x;
+      viewport.y = next.y;
+      viewport.z = next.z;
+      setWorldTransform();
+      return;
+    }
+    const from = { x: viewport.x, y: viewport.y, z: viewport.z };
+    const started = performance.now();
+    const run = (now) => {
+      if (token !== motionToken) return;
+      const progress = Math.min(1, (now - started) / 240);
+      const eased = 1 - (1 - progress) ** 3;
+      viewport.x = from.x + (next.x - from.x) * eased;
+      viewport.y = from.y + (next.y - from.y) * eased;
+      viewport.z = from.z + (next.z - from.z) * eased;
+      setWorldTransform();
+      if (progress < 1) requestAnimationFrame(run);
+    };
+    requestAnimationFrame(run);
   };
 
   const renderWires = (visible) => {
@@ -125,7 +150,7 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
       marker.setAttribute('aria-hidden', 'true');
       const kind = document.createElement('span');
       kind.className = 'kind';
-      kind.textContent = /ejemplo/i.test(node.title) ? `Ejemplo · ${node.type}` : node.type;
+      kind.textContent = node.type;
       marker.appendChild(kind);
       if (node.media?.length) {
         const mediaBadge = document.createElement('span');
@@ -154,9 +179,9 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
           icon.textContent = previewAsset.kind === 'video' ? '▶' : previewAsset.kind === 'audio' ? '♪' : '↗';
           preview.appendChild(icon);
         }
-        card.append(marker, title, description, preview);
+        card.append(title, marker, description, preview);
       } else {
-        card.append(marker, title, description);
+        card.append(title, marker, description);
       }
 
       card.addEventListener('pointerdown', (event) => {
@@ -167,9 +192,8 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
           connecting = null;
           return;
         }
-        store.select(node.id);
         moving = { id: node.id, startX: event.clientX, startY: event.clientY, originX: node.x, originY: node.y };
-        card.setPointerCapture(event.pointerId);
+        try { card.setPointerCapture(event.pointerId); } catch { /* el puntero ya no está activo */ }
       });
       card.addEventListener('pointermove', (event) => {
         if (!moving || moving.id !== node.id) return;
@@ -178,11 +202,17 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
         card.style.left = `${x}px`;
         card.style.top = `${y}px`;
       });
-      card.addEventListener('pointerup', () => {
+      card.addEventListener('pointerup', (event) => {
         if (!moving || moving.id !== node.id) return;
+        const travel = Math.hypot(event.clientX - moving.startX, event.clientY - moving.startY);
         const x = Number.parseFloat(card.style.left);
         const y = Number.parseFloat(card.style.top);
         moving = null;
+        if (travel < 8) {
+          store.select(node.id);
+          onInspect?.(node.id);
+          return;
+        }
         if (Number.isFinite(x) && Number.isFinite(y)) store.moveNode(node.id, x, y);
       });
       card.addEventListener('pointercancel', () => { moving = null; });
@@ -204,7 +234,7 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
 
     const kind = document.createElement('span');
     kind.className = 'kind';
-    kind.textContent = /ejemplo/i.test(node.title) ? `Ejemplo · ${node.type}` : node.type;
+    kind.textContent = node.type;
     const heading = document.createElement('h2');
     heading.textContent = node.title;
     root.editor.append(kind, heading);
@@ -324,7 +354,7 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
     remove.addEventListener('click', () => {
       if (window.confirm('¿Eliminar este nodo y sus conexiones?')) {
         store.deleteNode(node.id);
-        toast('Nodo eliminado');
+        toast('Nodo eliminado', { undo: true });
       }
     });
     actions.append(save, discard, remove);
@@ -410,11 +440,16 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
     const mediaCount = snapshot.state.data.reduce((total, node) => total + (node.media?.length ?? 0), 0);
     root.count.textContent = `${visible.length} de ${snapshot.state.data.length} nodos · ${snapshot.state.lines.length} conexiones · ${mediaCount} recursos`;
     const narrow = root.work.clientWidth < 761;
-    if (snapshot.query && !visible.length) root.status.textContent = 'Ningún ejemplo coincide con la búsqueda.';
-    else if (snapshot.reason === 'init') root.status.textContent = narrow
-      ? 'Ejemplos, no datos reales. Arrastra el fondo o pellizca para acercar.'
-      : 'Ejemplos, no datos reales. Arrastra el fondo o usa la rueda para acercar.';
-    else root.status.textContent = 'Cambios guardados en este navegador.';
+    const selected = snapshot.state.data.find((node) => node.id === snapshot.selectedId);
+    const place = selected
+      ? `${visible.length} de ${snapshot.state.data.length} · ${selected.type}`
+      : `${visible.length} de ${snapshot.state.data.length} en pantalla`;
+    const where = root.status.querySelector('[data-atlas-where]') || root.status;
+    if (snapshot.query && !visible.length) where.textContent = 'Ningún nodo coincide con la búsqueda.';
+    else if (snapshot.reason === 'init') where.textContent = narrow
+      ? 'Arrastra el fondo o pellizca para acercar.'
+      : 'Arrastra el fondo o usa la rueda para acercar.';
+    else where.textContent = place;
     root.railButtons.forEach((buttonElement) => {
       buttonElement.setAttribute('aria-pressed', String(buttonElement.dataset.atlasFilter === snapshot.filter));
     });
@@ -449,22 +484,68 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
       toast(`${labels[shape] ?? 'Elemento'} creado en el lienzo`);
       return;
     }
+    motionToken += 1;
     const start = { x: event.clientX, y: event.clientY, ox: viewport.x, oy: viewport.y };
+    let last = { x: event.clientX, y: event.clientY, t: performance.now(), vx: 0, vy: 0 };
+    let moved = 0;
     const move = (next) => {
       if (pointers.size > 1) return;
+      const now = performance.now();
+      const dt = Math.max(1, now - last.t);
+      last = {
+        x: next.clientX,
+        y: next.clientY,
+        t: now,
+        vx: (next.clientX - last.x) / dt,
+        vy: (next.clientY - last.y) / dt,
+      };
+      moved = Math.hypot(next.clientX - start.x, next.clientY - start.y);
       viewport.x = start.ox + next.clientX - start.x;
       viewport.y = start.oy + next.clientY - start.y;
       setWorldTransform();
     };
-    const end = () => {
+    const end = (next) => {
       root.work.removeEventListener('pointermove', move);
       root.work.removeEventListener('pointerup', end);
       root.work.removeEventListener('pointercancel', end);
+      if (next.type === 'pointercancel') return;
+      const now = performance.now();
+      if (moved < 8 && now - lastTap.t < 280 && Math.hypot(next.clientX - lastTap.x, next.clientY - lastTap.y) < 28) {
+        const rect = root.work.getBoundingClientRect();
+        const floor = root.work.clientWidth < 761 ? 0.55 : 0.35;
+        const zoom = Math.max(floor, Math.min(2.4, viewport.z * 1.35));
+        const px = next.clientX - rect.left;
+        const py = next.clientY - rect.top;
+        animateViewport({
+          z: zoom,
+          x: px - ((px - viewport.x) / viewport.z) * zoom,
+          y: py - ((py - viewport.y) / viewport.z) * zoom,
+        });
+        lastTap = { t: 0, x: 0, y: 0 };
+        return;
+      }
+      lastTap = { t: now, x: next.clientX, y: next.clientY };
+      if (reducedMotion() || moved < 8) return;
+      const token = ++motionToken;
+      let vx = last.vx * 16;
+      let vy = last.vy * 16;
+      const glide = () => {
+        if (token !== motionToken) return;
+        vx *= 0.9;
+        vy *= 0.9;
+        if (Math.hypot(vx, vy) < 0.35) return;
+        viewport.x += vx;
+        viewport.y += vy;
+        setWorldTransform();
+        requestAnimationFrame(glide);
+      };
+      requestAnimationFrame(glide);
     };
     root.work.addEventListener('pointermove', move);
     root.work.addEventListener('pointerup', end);
     root.work.addEventListener('pointercancel', end);
   };
+  let lastTap = { t: 0, x: 0, y: 0 };
   const pointers = new Map();
   let pinch = null;
   const pinchDistance = () => {
@@ -515,12 +596,13 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
     if (!node || !root.work.clientWidth) return;
     const narrow = root.work.clientWidth < 761;
     const zoom = narrow ? 1 : 0.85;
-    viewport.z = zoom;
     const cx = (Number(node.x) || 0) + 119;
     const cy = (Number(node.y) || 0) + 70;
-    viewport.x = root.work.clientWidth / 2 - cx * zoom;
-    viewport.y = root.work.clientHeight * 0.36 - cy * zoom;
-    setWorldTransform();
+    animateViewport({
+      z: zoom,
+      x: root.work.clientWidth / 2 - cx * zoom,
+      y: root.work.clientHeight * 0.36 - cy * zoom,
+    });
   };
 
   const frameReadable = () => {

@@ -159,11 +159,22 @@ function collectScript() {
 }
 
 async function record(page, report, name) {
+  await page.waitForTimeout(240);
   const row = await measure(page, name);
   report.push(row);
   console.log(`${row.name}: solapes ${row.overlaps}, etiquetas ${row.labelHits}, textos ${row.overflows}, scroll ${row.scroll}`);
   for (const sample of row.sample) console.log(`  - ${sample.a || sample.name} | ${sample.b || ''} ${sample.area || sample.scrollWidth || ''}`);
+  await shot(page, name.replaceAll(' ', '-'));
   return row;
+}
+
+async function setTheme(page, mode) {
+  const light = await page.evaluate(() => document.body.classList.contains('atlas-theme-light'));
+  if ((mode === 'light') === light) return;
+  const settings = page.locator('[data-atlas-settings]');
+  if (await settings.getAttribute('hidden') !== null) await page.locator('[data-action="toggle-settings"]').click();
+  await page.locator('[data-action="toggle-theme"]').click();
+  if (await page.locator('[data-atlas-settings]').isVisible()) await page.locator('[data-action="toggle-settings"]').click();
 }
 
 async function shot(page, name) {
@@ -203,6 +214,10 @@ async function openProcesos(page) {
     : '.atlas-rail [data-atlas-section-target="procesos"]';
   await page.locator(selector).click();
   await page.waitForSelector('[data-process-id]', { state: 'attached', timeout: 20000 });
+  const status = await page.locator('[data-atlas-bpmn-status]').innerText();
+  if (!status.includes('Validación')) {
+    await page.locator('[data-process-id]').first().click();
+  }
   await page.waitForFunction(() => (document.querySelector('[data-atlas-bpmn-status]')?.textContent || '').includes('Validación'), null, { timeout: 20000 });
 }
 
@@ -217,17 +232,21 @@ async function openProcess(page, id) {
 }
 
 const browser = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+const context = await browser.newContext();
+await context.addInitScript(() => {
+  try { localStorage.setItem('rr-atlas-tour-v1', '1'); } catch { /* el recorrido no entra en la medición */ }
+});
 await mkdir(OUT, { recursive: true });
-const page = await browser.newPage();
+const page = await context.newPage();
 const report = [];
 
 for (const vp of VIEWPORTS) {
   await page.setViewportSize({ width: vp.width, height: vp.height });
   await page.goto(BASE, { waitUntil: 'networkidle' });
   await page.waitForSelector('.atlas-card');
+  await setTheme(page, 'dark');
   const mobile = vp.width < 760;
   await record(page, report, `${vp.name} mapa`);
-  if (vp.name === '390x844' || vp.name === '360x800' || vp.name === '1440x900') await shot(page, `${vp.name}-mapa`);
 
   if (mobile) {
     const tools = page.locator('[data-action="toggle-tools"]');
@@ -235,7 +254,6 @@ for (const vp of VIEWPORTS) {
       await tools.click();
       await page.waitForTimeout(150);
       await record(page, report, `${vp.name} acciones`);
-      if (vp.name === '390x844' || vp.name === '360x800') await shot(page, `${vp.name}-acciones`);
     }
     const detail = page.locator('[data-action="toggle-detail"]');
     if (await detail.count()) {
@@ -246,28 +264,24 @@ for (const vp of VIEWPORTS) {
       });
       await page.waitForTimeout(200);
       await record(page, report, `${vp.name} detalle`);
-      if (vp.name === '390x844' || vp.name === '360x800') await shot(page, `${vp.name}-detalle`);
       const close = page.locator('[data-action="close-detail"]');
       if (await close.isVisible()) await close.click();
     }
     await page.locator('.atlas-tabbar [data-atlas-section-target="menu"]').click();
     await page.waitForTimeout(200);
     await record(page, report, `${vp.name} menu`);
-    if (vp.name === '390x844') await shot(page, `${vp.name}-menu`);
     await page.keyboard.press('Escape');
   }
 
   await page.locator('[data-action="toggle-settings"]').click();
   await page.waitForTimeout(150);
   await record(page, report, `${vp.name} configuracion`);
-  if (vp.name === '390x844') await shot(page, `${vp.name}-configuracion`);
   await page.locator('[data-action="toggle-settings"]').click();
 
   const search = page.locator('[data-atlas-search]');
   await search.fill('ejemplo');
   await page.waitForTimeout(200);
   await record(page, report, `${vp.name} busqueda`);
-  if (vp.name === '390x844') await shot(page, `${vp.name}-busqueda`);
   await search.fill('');
 
   if (mobile) await page.locator('.atlas-tabbar [data-atlas-section-target="procesos"]').click();
@@ -276,15 +290,12 @@ for (const vp of VIEWPORTS) {
   const back = page.locator('[data-action="bpmn-back"]');
   if (await back.isVisible()) await back.click();
   await record(page, report, `${vp.name} procesos-lista`);
-  if (vp.name === '390x844' || vp.name === '360x800') await shot(page, `${vp.name}-procesos-lista`);
 
   await openProcess(page, 'alianzas_como_nace_una_alianza');
   await record(page, report, `${vp.name} bpmn-alianzas`);
-  if (vp.name === '390x844' || vp.name === '360x800' || vp.name === '1440x900') await shot(page, `${vp.name}-bpmn-alianzas`);
 
   await openProcess(page, 'gobierno_como_se_gobierna_la_documentacion');
   await record(page, report, `${vp.name} bpmn-grande`);
-  if (vp.name === '390x844' || vp.name === '360x800') await shot(page, `${vp.name}-bpmn-grande`);
 
   const metaButton = page.locator('[data-action="bpmn-meta"]');
   if (mobile && await metaButton.count() && await metaButton.isVisible()) {
@@ -292,7 +303,6 @@ for (const vp of VIEWPORTS) {
     await page.waitForTimeout(150);
   }
   await record(page, report, `${vp.name} validacion`);
-  if (vp.name === '390x844' || vp.name === '360x800') await shot(page, `${vp.name}-validacion`);
 
   const backToList = page.locator('[data-action="bpmn-back"]');
   if (await backToList.isVisible()) await backToList.click();
@@ -301,28 +311,21 @@ for (const vp of VIEWPORTS) {
     await create.click();
     await page.waitForTimeout(150);
     await record(page, report, `${vp.name} nuevo-proceso`);
-    if (vp.name === '390x844') await shot(page, `${vp.name}-nuevo-proceso`);
     await page.keyboard.press('Escape');
   }
 
-  if (vp.name === '390x844' || vp.name === '1440x900') {
-    const settings = page.locator('[data-atlas-settings]');
-    if (await settings.getAttribute('hidden') !== null) await page.locator('[data-action="toggle-settings"]').click();
-    await page.locator('[data-action="toggle-theme"]').click();
-    if (await page.locator('[data-atlas-settings]').isVisible()) await page.locator('[data-action="toggle-settings"]').click();
-    await page.waitForTimeout(200);
-    await goMapa(page);
-    await page.waitForSelector('.atlas-card');
-    await record(page, report, `${vp.name} tema-claro-mapa`);
-    await shot(page, `${vp.name}-tema-claro-mapa`);
-    if (mobile) await page.locator('.atlas-tabbar [data-atlas-section-target="procesos"]').click();
-    else await page.locator('.atlas-rail [data-atlas-section-target="procesos"]').click();
-    await page.waitForFunction(() => (document.querySelector('[data-atlas-bpmn-status]')?.textContent || '').includes('Validación'));
-    await record(page, report, `${vp.name} tema-claro-bpmn`);
-    await shot(page, `${vp.name}-tema-claro-bpmn`);
-  }
+  await setTheme(page, 'light');
+  await goMapa(page);
+  await page.waitForSelector('.atlas-card');
+  await record(page, report, `${vp.name} tema-claro-mapa`);
+  if (mobile) await page.locator('.atlas-tabbar [data-atlas-section-target="procesos"]').click();
+  else await page.locator('.atlas-rail [data-atlas-section-target="procesos"]').click();
+  await page.waitForSelector('[data-process-id]', { state: 'attached' });
+  await openProcess(page, 'alianzas_como_nace_una_alianza');
+  await record(page, report, `${vp.name} tema-claro-bpmn`);
 }
 
+await context.close();
 await browser.close();
 await writeFile(`${OUT}/report.json`, JSON.stringify(report, null, 2));
 let overlaps = 0;

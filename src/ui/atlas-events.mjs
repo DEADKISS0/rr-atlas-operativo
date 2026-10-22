@@ -36,6 +36,10 @@ export function bindAtlasEvents({ root, store, view, knownLinks = [], onToast, a
   root.actions.zoomIn.addEventListener('click', () => view.zoomIn());
   root.actions.zoomOut.addEventListener('click', () => view.zoomOut());
   root.actions.center.addEventListener('click', () => view.center());
+  root.actions.locate?.addEventListener('click', () => {
+    view.center();
+    toast('Nodo seleccionado en el centro');
+  });
   const app = root.layout.closest('#atlas-app');
   root.actions.toggleTools?.addEventListener('click', () => {
     const open = !app?.classList.contains('is-tools-open');
@@ -50,7 +54,7 @@ export function bindAtlasEvents({ root, store, view, knownLinks = [], onToast, a
     const node = snapshot.state.data.find((item) => item.type === 'Proceso');
     if (node && store.select(node.id)) {
       view.frameNode(node.id);
-      toast('Ejemplo de proceso en el centro del mapa');
+      toast('Proceso en el centro del mapa');
     } else {
       toast('No hay un proceso de ejemplo en este mapa');
     }
@@ -161,11 +165,12 @@ export function bindAtlasEvents({ root, store, view, knownLinks = [], onToast, a
   });
 
   document.addEventListener('click', (event) => {
-    if (!root.settings.hidden && !root.settings.contains(event.target) && event.target !== root.actions.toggleSettings) {
+    if (event.target instanceof Element && event.target.matches('input[type="file"]')) return;
+    if (!root.settings.hidden && !root.settings.contains(event.target) && !root.actions.toggleSettings.contains(event.target)) {
       root.settings.hidden = true;
       root.actions.toggleSettings.setAttribute('aria-expanded', 'false');
     }
-    if (!root.drawMenu.hidden && !root.drawMenu.contains(event.target) && event.target !== root.actions.draw) {
+    if (!root.drawMenu.hidden && !root.drawMenu.contains(event.target) && !root.actions.draw.contains(event.target)) {
       root.drawMenu.hidden = true;
       root.actions.draw.setAttribute('aria-expanded', 'false');
     }

@@ -1,16 +1,20 @@
-import { STORAGE_KEY, createLocalRepository, PALETTE_COLORS } from '../core/atlas-state.mjs?v=bpmn-2';
-import { DEFAULT_GRAPH } from '../data/default-graph.mjs?v=bpmn-2';
-import { KNOWN_LINKS } from '../data/known-links.mjs?v=bpmn-2';
-import { createAtlasStore, DEFAULT_TYPES } from './atlas-store.mjs?v=bpmn-2';
-import { NODE_SHAPES, MEDIA_KINDS } from '../core/atlas-state.mjs?v=bpmn-2';
-import { createAtlasShell } from '../ui/atlas-shell.mjs?v=bpmn-2';
-import { createAtlasView } from '../ui/atlas-view.mjs?v=bpmn-2';
-import { createMediaFrame } from '../ui/atlas-media.mjs?v=bpmn-2';
-import { bindAtlasEvents } from '../ui/atlas-events.mjs?v=bpmn-2';
-import { createProcessView } from '../ui/atlas-process-view.mjs?v=bpmn-2';
-import { bindAtlasNavigation } from '../ui/atlas-nav.mjs?v=bpmn-2';
+import { STORAGE_KEY, createLocalRepository, PALETTE_COLORS } from '../core/atlas-state.mjs?v=bpmn-3';
+import { DEFAULT_GRAPH } from '../data/default-graph.mjs?v=bpmn-3';
+import { KNOWN_LINKS } from '../data/known-links.mjs?v=bpmn-3';
+import { createAtlasStore, DEFAULT_TYPES } from './atlas-store.mjs?v=bpmn-3';
+import { NODE_SHAPES, MEDIA_KINDS } from '../core/atlas-state.mjs?v=bpmn-3';
+import { createAtlasShell } from '../ui/atlas-shell.mjs?v=bpmn-3';
+import { createAtlasView } from '../ui/atlas-view.mjs?v=bpmn-3';
+import { createMediaFrame } from '../ui/atlas-media.mjs?v=bpmn-3';
+import { bindAtlasEvents } from '../ui/atlas-events.mjs?v=bpmn-3';
+import { createProcessView } from '../ui/atlas-process-view.mjs?v=bpmn-3';
+import { bindAtlasNavigation } from '../ui/atlas-nav.mjs?v=bpmn-3';
+import { bindPressables } from '../ui/pressable.mjs?v=bpmn-3';
+import { bindBottomSheet } from '../ui/sheet.mjs?v=bpmn-3';
+import { bindTour } from '../ui/tour.mjs?v=bpmn-3';
 
 const rootElement = document.querySelector('#atlas-app');
+document.body.append(rootElement.querySelector('[data-atlas-toast]'));
 const layout = rootElement.querySelector('[data-atlas-layout]');
 const repository = createLocalRepository(window.localStorage, STORAGE_KEY);
 const shell = createAtlasShell({ root: rootElement });
@@ -64,6 +68,7 @@ const root = {
     zoomIn: rootElement.querySelector('[data-action="zoom-in"]'),
     zoomOut: rootElement.querySelector('[data-action="zoom-out"]'),
     center: rootElement.querySelector('[data-action="center"]'),
+    locate: rootElement.querySelector('[data-action="locate"]'),
     toggleTools: rootElement.querySelector('[data-action="toggle-tools"]'),
     flow: rootElement.querySelector('[data-action="flow"]'),
     undo: rootElement.querySelector('[data-action="undo"]'),
@@ -101,10 +106,28 @@ const root = {
   },
 };
 
-const toast = (message) => {
-  rootElement.querySelector('[data-atlas-toast]').textContent = message;
-  rootElement.querySelector('[data-atlas-toast]').hidden = false;
-  window.setTimeout(() => { rootElement.querySelector('[data-atlas-toast]').hidden = true; }, 2800);
+let undoLast = () => false;
+let toastTimer = 0;
+const toast = (message, options = {}) => {
+  const el = document.querySelector('[data-atlas-toast]');
+  el.replaceChildren();
+  const text = document.createElement('span');
+  text.textContent = message;
+  el.append(text);
+  if (options.undo) {
+    const undo = document.createElement('button');
+    undo.type = 'button';
+    undo.className = 'atlas-button';
+    undo.textContent = 'Deshacer';
+    undo.addEventListener('click', () => {
+      undoLast();
+      el.hidden = true;
+    });
+    el.append(undo);
+  }
+  el.hidden = false;
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => { el.hidden = true; }, 3200);
 };
 
 const applyTheme = (mode) => {
@@ -131,7 +154,9 @@ const openAssetDialog = (nodeId, mode) => {
     ? 'Agrega una URL HTTPS. Drive, Docs, imágenes, videos, audio y PDF se intentan montar de forma segura.'
     : 'El enlace queda como referencia del nodo; no se copian archivos ni se guardan tokens.';
   root.modal.kindRow.hidden = !media;
-  root.modal.attach.textContent = media ? 'Montar recurso' : 'Asociar enlace';
+  const attachFace = root.modal.attach.querySelector(':scope > .rr-press-face');
+  if (attachFace) attachFace.textContent = media ? 'Montar recurso' : 'Asociar enlace';
+  else root.modal.attach.textContent = media ? 'Montar recurso' : 'Asociar enlace';
   root.modal.dialog.showModal();
 };
 
@@ -143,10 +168,16 @@ const openViewer = (asset) => {
 };
 
 const store = createAtlasStore({ repository, initialGraph: DEFAULT_GRAPH });
+undoLast = () => store.undo();
 const view = createAtlasView({
   root,
   store,
   onToast: toast,
+  onInspect(id) {
+    rootElement.classList.add('is-detail-open');
+    rootElement.querySelector('.atlas-sidebar')?.classList.remove('is-shown');
+    requestAnimationFrame(() => view.frameNode(id));
+  },
   onLinkRequest(nodeId) { openAssetDialog(nodeId, 'link'); },
   onMediaRequest(nodeId) { openAssetDialog(nodeId, 'media'); },
   onMediaOpen: openViewer,
@@ -155,4 +186,10 @@ const view = createAtlasView({
 bindAtlasEvents({ root, store, view, knownLinks: KNOWN_LINKS, onToast: toast, applyTheme });
 const processView = createProcessView({ app: rootElement, onToast: toast });
 bindAtlasNavigation({ app: rootElement, search: root.search, processView });
+bindPressables(rootElement);
+bindBottomSheet(rootElement.querySelector('.atlas-sidebar'), {
+  app: rootElement,
+  onClose: () => rootElement.classList.remove('is-detail-open'),
+});
+bindTour({ app: rootElement });
 store.subscribe((snapshot) => view.render(snapshot));

@@ -45,7 +45,7 @@ body.atlas-theme-light .atlas-button--primary { background: var(--rr-mustard); b
 .atlas-doc a { flex: 1; color: var(--rr-paper); }
 .atlas-doc button { padding: 3px 8px; }
 .atlas-notice { margin-top: 16px; padding: 10px; border: 1px solid var(--rr-orchid); color: var(--rr-muted); font-size: 12px; line-height: 1.5; }
-.atlas-toast { position: fixed; right: 18px; bottom: 18px; z-index: 20; display: none; max-width: 360px; padding: 10px 12px; border: 1px solid var(--rr-mustard); background: var(--rr-ink); color: var(--rr-paper); }
+.atlas-toast { position: fixed; right: 18px; bottom: 18px; z-index: 38; display: none; max-width: 360px; padding: 10px 12px; border: 1px solid var(--rr-mustard); background: var(--rr-ink); color: var(--rr-paper); }
 .atlas-toast:not([hidden]) { display: block; }
 .atlas-sidebar hr { margin: 22px 0; border: 0; border-top: 1px solid var(--rr-orchid); }
 .atlas-dialog-form { min-width: 0; width: min(520px, calc(100vw - 32px)); padding: 8px; }

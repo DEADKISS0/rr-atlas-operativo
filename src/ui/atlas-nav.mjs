@@ -35,6 +35,11 @@ export function bindAtlasNavigation({ app, search, processView }) {
     });
     closeMenu();
     if (section === 'procesos') processView.activate();
+    const surface = section === 'procesos'
+      ? app.querySelector('[data-atlas-process]')
+      : app.querySelector('.atlas-canvas');
+    surface?.classList.remove('is-entering');
+    requestAnimationFrame(() => surface?.classList.add('is-entering'));
   };
 
   app.querySelectorAll('[data-atlas-section-target]').forEach((button) => {

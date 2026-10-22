@@ -10,8 +10,8 @@ import {
   parseProcessMeta,
   presentSource,
   purposeFromDocumentation,
-} from '../core/process-model.mjs?v=bpmn-2';
-import { issueLabel } from '../bpmn/lint/messages.mjs?v=bpmn-2';
+} from '../core/process-model.mjs?v=bpmn-3';
+import { issueLabel } from '../bpmn/lint/messages.mjs?v=bpmn-3';
 
 const ESTADO = {
   borrador: 'Borrador',
@@ -66,9 +66,8 @@ export function createProcessView({ app, onToast }) {
       stepLabel.textContent = 'Inicio';
       return;
     }
-    const lane = step.lane ? ` · ${step.lane}` : '';
-    stepLabel.textContent = `${step.index + 1} de ${step.total}${lane}`;
-    stepLabel.title = step.name || '';
+    stepLabel.textContent = `${step.index + 1} de ${step.total}`;
+    stepLabel.title = [step.name, step.lane].filter(Boolean).join(' · ');
   };
 
   const renderLanes = (xml) => {
@@ -91,7 +90,7 @@ export function createProcessView({ app, onToast }) {
     if (workspace) return workspace;
     if (!ready) {
       setStatus('Cargando el visor BPMN…');
-      ready = import('/src/bpmn/bpmn-bundle.mjs?v=bpmn-2')
+      ready = import('/src/bpmn/bpmn-bundle.mjs?v=bpmn-3')
         .then((module) => {
           workspace = module.createBpmnWorkspace({
             container: canvas,
@@ -170,9 +169,9 @@ export function createProcessView({ app, onToast }) {
     const purpose = purposeFromDocumentation(metaData.documentation);
     const note = document.createElement('p');
     note.className = 'atlas-muted';
-    note.textContent = current.source === 'semilla'
-      ? `Ejemplo anonimizado.${purpose ? ` ${purpose}` : ''}`
-      : (purpose || 'Borrador local. Lo que no se conoce queda en DESCONOCIDO.');
+    note.textContent = purpose || (current.source === 'semilla'
+      ? 'Proceso de referencia. Lo que no está declarado queda en DESCONOCIDO.'
+      : 'Borrador local. Lo que no se conoce queda en DESCONOCIDO.');
     meta.append(note);
 
     const lintTitle = document.createElement('h3');
@@ -254,7 +253,10 @@ export function createProcessView({ app, onToast }) {
     section.classList.add('is-diagram');
     renderList();
     const tool = section.querySelector('[data-action="bpmn-edit"]');
-    tool.textContent = editable ? 'Ver' : (record.source === 'semilla' ? 'Editar copia' : 'Editar');
+    const face = tool.querySelector(':scope > .rr-press-face');
+    const editLabel = editable ? 'Ver' : (record.source === 'semilla' ? 'Editar copia' : 'Editar');
+    if (face) face.textContent = editLabel;
+    else tool.textContent = editLabel;
     try {
       const board = await ensureWorkspace();
       const report = await board.open(record.xml, { editable, fileName: record.file || '' });
@@ -287,8 +289,10 @@ export function createProcessView({ app, onToast }) {
     if (!loaded) {
       loaded = loadSeeds().then(() => {
         renderList();
-        if (!current && seeds[0]) return openRecord(seeds[0]);
-        return workspace?.fit();
+        const narrow = window.matchMedia('(max-width: 760px)').matches;
+        if (!narrow && !current && seeds[0]) return openRecord(seeds[0]);
+        if (current) return workspace?.fit();
+        return undefined;
       }).catch((error) => {
         loaded = null;
         setStatus(error.message || 'No se pudieron leer las semillas');
@@ -321,7 +325,36 @@ export function createProcessView({ app, onToast }) {
   });
   section.querySelector('[data-action="bpmn-zoom-in"]').addEventListener('click', () => workspace?.zoom(1.2));
   section.querySelector('[data-action="bpmn-zoom-out"]').addEventListener('click', () => workspace?.zoom(1 / 1.2));
-  section.querySelector('[data-action="bpmn-back"]').addEventListener('click', () => section.classList.remove('is-diagram'));
+  let playing = null;
+  const playButton = section.querySelector('[data-action="bpmn-play"]');
+  const setPlayLabel = (text) => {
+    const face = playButton?.querySelector(':scope > .rr-press-face');
+    if (face) face.textContent = text;
+    else if (playButton) playButton.textContent = text;
+  };
+  const stopPlay = () => {
+    if (playing) window.clearInterval(playing);
+    playing = null;
+    playButton?.setAttribute('aria-pressed', 'false');
+    setPlayLabel('Recorrer');
+  };
+  playButton?.addEventListener('click', () => {
+    if (playing) {
+      stopPlay();
+      return;
+    }
+    playButton.setAttribute('aria-pressed', 'true');
+    setPlayLabel('Detener');
+    playing = window.setInterval(() => {
+      const step = workspace?.step(1);
+      renderStep(step);
+      if (step && step.index >= step.total - 1) stopPlay();
+    }, 900);
+  });
+  section.querySelector('[data-action="bpmn-back"]').addEventListener('click', () => {
+    stopPlay();
+    section.classList.remove('is-diagram');
+  });
   section.querySelector('[data-action="new-process"]').addEventListener('click', () => dialog.showModal());
   section.querySelector('[data-action="import-bpmn"]').addEventListener('click', () => fileInput.click());
   section.querySelector('[data-action="bpmn-edit"]').addEventListener('click', async () => {

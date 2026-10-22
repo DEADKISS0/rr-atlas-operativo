@@ -1,4 +1,4 @@
-import { normalizeGraph, parseSnapshot } from '../core/atlas-state.mjs?v=bpmn-2';
+import { normalizeGraph, parseSnapshot } from '../core/atlas-state.mjs?v=bpmn-3';
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const same = (left, right) => JSON.stringify(left) === JSON.stringify(right);
