@@ -6,7 +6,8 @@ button,
   background: var(--rr-button);
   color: var(--rr-paper);
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
   box-shadow: var(--rr-panel-shadow);
   transition: transform .12s cubic-bezier(.23, 1, .32, 1), background-color .15s ease, border-color .15s ease;
 }
@@ -38,7 +39,7 @@ body.atlas-theme-light .atlas-button--primary { background: var(--rr-mustard); b
 .atlas-card:hover { border-color: var(--rr-mustard); }
 .atlas-card.is-active { border-color: var(--rr-mustard); box-shadow: 0 0 0 2px #ded11655, var(--rr-shadow); }
 .atlas-card .kind, .kind { display: block; color: var(--rr-accent-text); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
-.atlas-card h3 { margin: 9px 0 7px; font-size: 16px; overflow-wrap: anywhere; }
+.atlas-card h3 { margin: 9px 0 7px; font-size: 16px; overflow-wrap: normal; word-break: normal; }
 .atlas-card p { margin: 0; color: var(--rr-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 
 .atlas-doc { display: flex; align-items: center; gap: 8px; margin: 8px 0; }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { findLabelHits, findOverlaps, findOverflows, intersectionArea } from './overlap.mjs';
+import { findLabelHits, findOverlaps, findOverflows, findPressMisalignments, findWordBreaks, intersectionArea } from './overlap.mjs';
 
 test('dos cajas separadas no se pisan', () => {
   assert.equal(intersectionArea({ x: 0, y: 0, w: 10, h: 10 }, { x: 20, y: 0, w: 10, h: 10 }), 0);
@@ -55,4 +55,20 @@ test('el texto desbordado se detecta y el que cabe no', () => {
     { name: 'lista', overflow: false, scrollWidth: 800, clientWidth: 300 },
   ]);
   assert.deepEqual(hits.map((item) => item.name), ['título']);
+});
+
+test('una palabra en dos líneas cuenta como partida', () => {
+  const hits = findWordBreaks([
+    { name: 'Procesos', words: ['Procesos'] },
+    { name: 'Mapa', words: [] },
+  ]);
+  assert.deepEqual(hits.map((item) => item.name), ['Procesos']);
+});
+
+test('la cara y la sombra descuadradas cuentan y un subpíxel no', () => {
+  const hits = findPressMisalignments([
+    { name: 'Mapa', face: { x: 8, y: 10, w: 70, h: 44 }, shadow: { x: 0, y: 14, w: 86, h: 48 } },
+    { name: 'Menú', face: { x: 1, y: 1, w: 40, h: 44 }, shadow: { x: 1.4, y: 1.2, w: 40.5, h: 44.2 } },
+  ]);
+  assert.deepEqual(hits.map((item) => item.name), ['Mapa']);
 });

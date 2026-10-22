@@ -4,6 +4,8 @@
  * un paso a la vez, se puede omitir, y reduced-motion no esconde el contenido.
  */
 
+import { setPressLabel } from './pressable.mjs?v=bpmn-4';
+
 const KEY = 'rr-atlas-tour-v1';
 
 const STEPS = [
@@ -37,7 +39,7 @@ export function bindTour({ app }) {
     const step = STEPS[index];
     title.textContent = step.title;
     copy.textContent = step.copy;
-    next.textContent = index === STEPS.length - 1 ? 'Listo' : 'Siguiente';
+    setPressLabel(next, index === STEPS.length - 1 ? 'Listo' : 'Siguiente');
     app.querySelectorAll('.atlas-tabbar button').forEach((button) => {
       button.classList.toggle('is-tour-target', button.dataset.atlasSectionTarget === step.tab);
     });

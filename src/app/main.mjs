@@ -11,7 +11,7 @@ import { createProcessView } from '../ui/atlas-process-view.mjs?v=bpmn-3';
 import { bindAtlasNavigation } from '../ui/atlas-nav.mjs?v=bpmn-3';
 import { bindPressables } from '../ui/pressable.mjs?v=bpmn-3';
 import { bindBottomSheet } from '../ui/sheet.mjs?v=bpmn-3';
-import { bindTour } from '../ui/tour.mjs?v=bpmn-3';
+import { bindTour } from '../ui/tour.mjs?v=bpmn-4';
 
 const rootElement = document.querySelector('#atlas-app');
 document.body.append(rootElement.querySelector('[data-atlas-toast]'));

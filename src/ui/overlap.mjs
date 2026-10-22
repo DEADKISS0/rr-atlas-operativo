@@ -62,3 +62,11 @@ export function findLabelHits(labels, shapes, { minArea = 48 } = {}) {
 export function findOverflows(items) {
   return items.filter((item) => item.overflow && item.clientWidth > 0 && item.scrollWidth > item.clientWidth + 1);
 }
+
+export function findWordBreaks(items) {
+  return items.filter((item) => item.words?.length);
+}
+
+export function findPressMisalignments(pairs, { tolerance = 1.5 } = {}) {
+  return pairs.filter((pair) => ['x', 'y', 'w', 'h'].some((key) => Math.abs(pair.face[key] - pair.shadow[key]) > tolerance));
+}

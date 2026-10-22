@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { findLabelHits, findOverlaps, findOverflows } from '../src/ui/overlap.mjs';
+import { findLabelHits, findOverlaps, findOverflows, findPressMisalignments, findWordBreaks } from '../src/ui/overlap.mjs';
 
 const playwright = await import(process.env.PLAYWRIGHT_CORE || 'playwright-core');
 const { chromium } = playwright.default ?? playwright;
@@ -148,6 +148,68 @@ function collectScript() {
     item.name = `forma ${type || visual.textContent || ''}`.trim().slice(0, 70);
     shapes.push(item);
   });
+  const brokenWords = (el) => {
+    const words = [];
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        if (!node.textContent || !node.textContent.trim()) return NodeFilter.FILTER_REJECT;
+        const parent = node.parentElement;
+        if (!parent || parent.closest('svg, .sr-only, [hidden]')) return NodeFilter.FILTER_REJECT;
+        if (!el.contains(parent)) return NodeFilter.FILTER_REJECT;
+        if (el.matches('button') && parent.closest('button') !== el) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    let node = walker.nextNode();
+    while (node) {
+      const value = node.nodeValue || '';
+      const pattern = /\S+/g;
+      let match = pattern.exec(value);
+      while (match) {
+        const word = match[0];
+        if (word.length > 1) {
+          const range = document.createRange();
+          range.setStart(node, match.index);
+          range.setEnd(node, match.index + word.length);
+          const lines = [];
+          for (const rect of range.getClientRects()) {
+            if (rect.width < 0.5 || rect.height < 0.5) continue;
+            const line = lines.find((item) => Math.abs(item - rect.top) < 2);
+            if (line == null) lines.push(rect.top);
+          }
+          if (lines.length > 1) words.push(word);
+        }
+        match = pattern.exec(value);
+      }
+      node = walker.nextNode();
+    }
+    return words;
+  };
+  const wordBreaks = [];
+  document.querySelectorAll('button, .atlas-brand strong').forEach((el) => {
+    if (el.closest('[hidden], .djs-container')) return;
+    const style = getComputedStyle(el);
+    if (style.display === 'none' || style.visibility === 'hidden') return;
+    const words = brokenWords(el);
+    const label = (el.getAttribute('aria-label') || el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+    if (words.length) wordBreaks.push({ name: label, words });
+  });
+  const presses = [];
+  document.querySelectorAll('.rr-press').forEach((button) => {
+    if (button.closest('[hidden]')) return;
+    const face = button.querySelector(':scope > .rr-press-face');
+    const shadow = button.querySelector(':scope > .rr-press-shadow');
+    if (!face || !shadow) return;
+    if (getComputedStyle(face).display === 'none' || getComputedStyle(shadow).display === 'none') return;
+    const faceBox = face.getBoundingClientRect();
+    const shadowBox = shadow.getBoundingClientRect();
+    if (faceBox.width < 2 || shadowBox.width < 2) return;
+    presses.push({
+      name: (button.getAttribute('aria-label') || face.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60),
+      face: { x: faceBox.x, y: faceBox.y, w: faceBox.width, h: faceBox.height },
+      shadow: { x: shadowBox.x, y: shadowBox.y, w: shadowBox.width, h: shadowBox.height },
+    });
+  });
   return {
     scrollWidth: root.scrollWidth,
     clientWidth: root.clientWidth,
@@ -155,6 +217,8 @@ function collectScript() {
     labels,
     shapes,
     overflows,
+    wordBreaks,
+    presses,
   };
 }
 
@@ -162,7 +226,7 @@ async function record(page, report, name) {
   await page.waitForTimeout(240);
   const row = await measure(page, name);
   report.push(row);
-  console.log(`${row.name}: solapes ${row.overlaps}, etiquetas ${row.labelHits}, textos ${row.overflows}, scroll ${row.scroll}`);
+  console.log(`${row.name}: solapes ${row.overlaps}, etiquetas ${row.labelHits}, textos ${row.overflows}, partidas ${row.wordBreaks}, presión ${row.presses}, scroll ${row.scroll}`);
   for (const sample of row.sample) console.log(`  - ${sample.a || sample.name} | ${sample.b || ''} ${sample.area || sample.scrollWidth || ''}`);
   await shot(page, name.replaceAll(' ', '-'));
   return row;
@@ -187,6 +251,8 @@ async function measure(page, name) {
   const overlaps = findOverlaps(raw.nodes);
   const labelHits = findLabelHits(raw.labels, raw.shapes);
   const overflows = findOverflows(raw.overflows);
+  const wordBreaks = findWordBreaks(raw.wordBreaks || []);
+  const presses = findPressMisalignments(raw.presses || []);
   return {
     name,
     scroll: `${raw.scrollWidth}/${raw.clientWidth}`,
@@ -194,7 +260,15 @@ async function measure(page, name) {
     overlaps: overlaps.length,
     labelHits: labelHits.length,
     overflows: overflows.length,
-    sample: [...overlaps.slice(0, 6), ...labelHits.slice(0, 4), ...overflows.slice(0, 4)],
+    wordBreaks: wordBreaks.length,
+    presses: presses.length,
+    sample: [
+      ...overlaps.slice(0, 4),
+      ...labelHits.slice(0, 3),
+      ...overflows.slice(0, 3),
+      ...wordBreaks.slice(0, 4).map((item) => ({ name: `partida ${item.name}: ${item.words.join(', ')}` })),
+      ...presses.slice(0, 4).map((item) => ({ name: `presión ${item.name}` })),
+    ],
   };
 }
 
@@ -325,17 +399,43 @@ for (const vp of VIEWPORTS) {
   await record(page, report, `${vp.name} tema-claro-bpmn`);
 }
 
+const tourContext = await browser.newContext();
+const tourPage = await tourContext.newPage();
+for (const vp of VIEWPORTS.filter((item) => item.width < 760)) {
+  await tourPage.setViewportSize({ width: vp.width, height: vp.height });
+  await tourPage.goto(BASE, { waitUntil: 'networkidle' });
+  await tourPage.evaluate(() => localStorage.removeItem('rr-atlas-tour-v1'));
+  await tourPage.reload({ waitUntil: 'networkidle' });
+  await tourPage.waitForSelector('.atlas-card');
+  await tourPage.waitForSelector('[data-atlas-tour]:not([hidden])');
+  await tourPage.waitForTimeout(240);
+  await shot(tourPage, `${vp.name}-mapa-recorrido`);
+  await tourPage.locator('[data-atlas-tour-skip]').click();
+  await tourPage.waitForTimeout(200);
+  await shot(tourPage, `${vp.name}-mapa-sin-recorrido`);
+  await tourPage.locator('.atlas-tabbar [data-atlas-section-target="procesos"]').click();
+  await tourPage.waitForSelector('[data-process-id]', { state: 'attached' });
+  await tourPage.waitForTimeout(240);
+  await shot(tourPage, `${vp.name}-procesos`);
+}
+await tourContext.close();
+
 await context.close();
 await browser.close();
 await writeFile(`${OUT}/report.json`, JSON.stringify(report, null, 2));
 let overlaps = 0;
 let labels = 0;
 let overflows = 0;
+let wordBreaks = 0;
+let presses = 0;
 for (const row of report) {
   overlaps += row.overlaps;
   labels += row.labelHits;
   overflows += row.overflows;
-  console.log(`${row.name}: solapes ${row.overlaps}, etiquetas ${row.labelHits}, textos ${row.overflows}, scroll ${row.scroll}`);
+  wordBreaks += row.wordBreaks;
+  presses += row.presses;
+  console.log(`${row.name}: solapes ${row.overlaps}, etiquetas ${row.labelHits}, textos ${row.overflows}, partidas ${row.wordBreaks}, presión ${row.presses}, scroll ${row.scroll}`);
   for (const sample of row.sample) console.log(`  - ${sample.a || sample.name} ${sample.b || ''} ${sample.area || sample.scrollWidth || ''}`);
 }
-console.log(`TOTAL solapes ${overlaps} etiquetas ${labels} textos ${overflows}`);
+console.log(`TOTAL solapes ${overlaps} etiquetas ${labels} textos ${overflows} partidas ${wordBreaks} presión ${presses}`);
+if (wordBreaks || presses) process.exitCode = 1;

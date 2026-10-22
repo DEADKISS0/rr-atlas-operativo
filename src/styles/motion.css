@@ -10,7 +10,7 @@
 ::selection { background: var(--rr-fuchsia); color: var(--rr-paper-fixed); }
 :focus-visible { outline: 2px solid var(--rr-focus); outline-offset: 2px; }
 
-.rr-press {
+button.rr-press {
   position: relative;
   display: inline-flex;
   width: auto;
@@ -21,12 +21,27 @@
   background: transparent;
   box-shadow: none;
   color: inherit;
+  transform: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
+button.rr-press:hover,
+button.rr-press:active,
+button.rr-press[aria-pressed="true"],
+body.atlas-theme-light button.rr-press:hover,
+.atlas-rail button.rr-press:hover,
+.atlas-rail button.rr-press[aria-pressed="true"],
+.atlas-tabbar button.rr-press[aria-pressed="true"],
+.atlas-process-card.rr-press[aria-pressed="true"] {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  transform: none;
+  color: inherit;
+}
 .rr-press-shadow {
   position: absolute;
-  inset: var(--rr-press-depth) 0 0;
+  inset: 0 0 var(--rr-press-depth) 0;
   border-radius: 10px;
   background: color-mix(in oklab, var(--rr-ink-fixed) 82%, var(--rr-orchid));
   pointer-events: none;
@@ -45,22 +60,31 @@
   background: var(--rr-button);
   color: var(--rr-paper);
   text-align: center;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: manual;
   transition: transform var(--rr-motion) var(--rr-ease);
 }
 .rr-press[data-pressed] .rr-press-face { transform: translateY(var(--rr-press-depth)); }
-.rr-press:focus-visible .rr-press-face { outline: 2px solid var(--rr-focus); outline-offset: 2px; }
+.rr-press:focus-visible .rr-press-face { outline: 2px solid var(--rr-focus); outline-offset: -2px; }
 .rr-press:disabled { opacity: .45; }
-.rr-press.atlas-button--primary .rr-press-face {
+button.rr-press:hover .rr-press-face,
+body.atlas-theme-light button.rr-press:hover .rr-press-face { background: var(--rr-button-hover); }
+.rr-press.atlas-button--primary .rr-press-face,
+button.rr-press.atlas-button--primary:hover .rr-press-face {
   background: var(--rr-mustard);
   border-color: var(--rr-mustard);
   color: var(--rr-ink-fixed);
 }
-.rr-press.atlas-button--danger .rr-press-face {
+.rr-press.atlas-button--danger .rr-press-face,
+button.rr-press.atlas-button--danger:hover .rr-press-face {
   background: var(--rr-fuchsia);
   border-color: var(--rr-fuchsia);
   color: var(--rr-paper-fixed);
 }
-.rr-press.atlas-button--icon .rr-press-face { width: 44px; min-width: 44px; padding-inline: 0; }
+.rr-press.atlas-button--icon { width: 44px; min-width: 44px; }
+.rr-press.atlas-button--icon .rr-press-face { width: 100%; min-width: 0; padding-inline: 0; }
 .atlas-rail .rr-press,
 .atlas-tabbar .rr-press,
 .atlas-settings-panel .rr-press,
@@ -68,14 +92,31 @@
 .atlas-process-list .rr-press,
 .atlas-process-actions .rr-press { width: 100%; }
 .atlas-tabbar .rr-press[aria-pressed="true"] .rr-press-face,
-.atlas-rail .rr-press[aria-pressed="true"] .rr-press-face {
+.atlas-rail .rr-press[aria-pressed="true"] .rr-press-face,
+.atlas-process-card.rr-press[aria-pressed="true"] .rr-press-face,
+.atlas-tabbar button.rr-press[aria-pressed="true"]:hover .rr-press-face,
+.atlas-rail button.rr-press[aria-pressed="true"]:hover .rr-press-face,
+.atlas-process-card.rr-press[aria-pressed="true"]:hover .rr-press-face {
   background: var(--rr-fuchsia);
   border-color: var(--rr-fuchsia);
   color: var(--rr-paper-fixed);
 }
 .atlas-tabbar button.is-tour-target .rr-press-face {
-  outline: 2px solid var(--rr-mustard);
-  outline-offset: 2px;
+  border-color: var(--rr-mustard);
+  box-shadow: inset 0 0 0 2px var(--rr-mustard);
+  outline: none;
+}
+.atlas-process-card .rr-press-face,
+.atlas-lint-item .rr-press-face {
+  display: block;
+  text-align: left;
+  white-space: normal;
+}
+.atlas-rail .rr-press-face,
+.atlas-settings-panel .rr-press-face,
+.atlas-toolbar-extra .rr-press-face {
+  justify-content: flex-start;
+  text-align: left;
 }
 
 .atlas-canvas.is-entering,
@@ -134,8 +175,16 @@
   box-shadow: 0 16px 40px rgba(7, 0, 1, .35);
 }
 .atlas-tour h2 { margin: 0; font-size: 20px; }
-.atlas-tour p { margin: 0; font-size: 16px; line-height: 1.4; }
-.atlas-tour-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.atlas-tour p { margin: 0; font-size: 16px; line-height: 1.4; overflow-wrap: normal; word-break: normal; }
+.atlas-tour-actions { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; gap: 8px; }
+.atlas-tour-actions .rr-press { width: 100%; }
+.atlas-tour .rr-press .rr-press-face { min-height: 44px; width: 100%; }
+.atlas-tour .rr-press.atlas-button--primary .rr-press-face,
+.atlas-tour button.rr-press.atlas-button--primary:hover .rr-press-face {
+  background: var(--rr-fuchsia);
+  border-color: var(--rr-fuchsia);
+  color: var(--rr-paper-fixed);
+}
 
 .atlas-toast {
   display: flex;
@@ -158,11 +207,24 @@
     padding: 8px 12px;
     padding-top: calc(8px + env(safe-area-inset-top));
   }
-  .atlas-brand { flex: 0 1 auto; min-width: 0; }
-  .atlas-brand span { display: none; }
-  .atlas-logo-frame { width: 40px; height: 40px; }
-  .atlas-logo-image { width: 28px; height: 28px; }
-  .atlas-brand strong { font-size: 15px; }
+  .atlas-brand { flex: 0 0 auto; min-width: 0; gap: 8px; }
+  .atlas-brand > div > span { display: none; }
+  .atlas-brand > .atlas-logo-frame {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    padding: 2px;
+    box-shadow: none;
+    flex: 0 0 auto;
+  }
+  .atlas-brand .atlas-logo-image { width: 28px; height: 28px; }
+  .atlas-brand strong { font-size: 14px; line-height: 1; white-space: nowrap; }
+  .atlas-tabbar .rr-press-face {
+    padding: 6px 2px;
+    font-size: 14px;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
   .atlas-header-tools {
     flex: 1 1 auto;
     display: flex;
@@ -180,6 +242,7 @@
 .atlas-rail .rr-press { padding: 0 0 var(--rr-press-depth); margin: 4px 0; background: transparent; border: 0; }
 @media (min-width: 761px) {
   .atlas-tour { display: none !important; }
+  .atlas-settings-toggle.rr-press { width: auto; min-width: 44px; }
   .atlas-settings-toggle.rr-press .rr-press-face { width: auto; min-width: 44px; padding-inline: 12px; }
 }
 
