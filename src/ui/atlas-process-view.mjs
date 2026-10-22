@@ -4,11 +4,14 @@ import {
   createLocalProcessRepository,
   createNewProcessXml,
   describeSeed,
+  listLanes,
   listSteps,
   normalizeStoredProcess,
   parseProcessMeta,
-} from '../core/process-model.mjs?v=bpmn-1';
-import { issueLabel } from '../bpmn/lint/messages.mjs?v=bpmn-1';
+  presentSource,
+  purposeFromDocumentation,
+} from '../core/process-model.mjs?v=bpmn-2';
+import { issueLabel } from '../bpmn/lint/messages.mjs?v=bpmn-2';
 
 const ESTADO = {
   borrador: 'Borrador',
@@ -54,12 +57,41 @@ export function createProcessView({ app, onToast }) {
   const saveLocals = () => repository.save({ processes: locals });
 
   const setStatus = (message) => { status.textContent = message; };
+  const stepLabel = section.querySelector('[data-atlas-step]');
+  const laneLegend = section.querySelector('[data-atlas-lanes]');
+
+  const renderStep = (step) => {
+    if (!stepLabel) return;
+    if (!step?.total) {
+      stepLabel.textContent = 'Inicio';
+      return;
+    }
+    const lane = step.lane ? ` · ${step.lane}` : '';
+    stepLabel.textContent = `${step.index + 1} de ${step.total}${lane}`;
+    stepLabel.title = step.name || '';
+  };
+
+  const renderLanes = (xml) => {
+    if (!laneLegend) return;
+    laneLegend.replaceChildren();
+    const lanes = listLanes(xml);
+    if (!lanes.length) {
+      laneLegend.hidden = true;
+      return;
+    }
+    laneLegend.hidden = false;
+    for (const name of lanes) {
+      const chip = document.createElement('span');
+      chip.textContent = name;
+      laneLegend.append(chip);
+    }
+  };
 
   const ensureWorkspace = async () => {
     if (workspace) return workspace;
     if (!ready) {
       setStatus('Cargando el visor BPMN…');
-      ready = import('/src/bpmn/bpmn-bundle.mjs?v=bpmn-1')
+      ready = import('/src/bpmn/bpmn-bundle.mjs?v=bpmn-2')
         .then((module) => {
           workspace = module.createBpmnWorkspace({
             container: canvas,
@@ -124,7 +156,7 @@ export function createProcessView({ app, onToast }) {
       ['KPI', metaData.kpi || UNKNOWN],
       ['Línea base', metaData.lineaBase || UNKNOWN],
       ['Fecha de corte', metaData.fechaCorte || UNKNOWN],
-      ['Fuente', metaData.fuente || UNKNOWN],
+      ['Fuente', presentSource(metaData.fuente)],
       ['Área', current.area || UNKNOWN],
     ]) {
       const term = document.createElement('dt');
@@ -135,12 +167,13 @@ export function createProcessView({ app, onToast }) {
     }
     meta.append(fields);
 
-    if (metaData.documentation) {
-      const note = document.createElement('p');
-      note.className = 'atlas-muted';
-      note.textContent = metaData.documentation;
-      meta.append(note);
-    }
+    const purpose = purposeFromDocumentation(metaData.documentation);
+    const note = document.createElement('p');
+    note.className = 'atlas-muted';
+    note.textContent = current.source === 'semilla'
+      ? `Ejemplo anonimizado.${purpose ? ` ${purpose}` : ''}`
+      : (purpose || 'Borrador local. Lo que no se conoce queda en DESCONOCIDO.');
+    meta.append(note);
 
     const lintTitle = document.createElement('h3');
     lintTitle.textContent = 'Validación';
@@ -225,9 +258,13 @@ export function createProcessView({ app, onToast }) {
     try {
       const board = await ensureWorkspace();
       const report = await board.open(record.xml, { editable, fileName: record.file || '' });
+      renderLanes(record.xml);
+      renderStep(report.step);
+      requestAnimationFrame(() => {
+        if (workspace) renderStep(workspace.recenter());
+      });
       if (report.importError) onToast?.('El diagrama no se pudo importar');
       else onToast?.(editable ? 'Editor BPMN listo' : 'Diagrama cargado');
-      requestAnimationFrame(() => workspace?.fit());
     } catch (error) {
       setStatus(error.message || 'No se pudo abrir el proceso');
     }
@@ -267,7 +304,21 @@ export function createProcessView({ app, onToast }) {
     renderList();
   });
 
-  section.querySelector('[data-action="bpmn-fit"]').addEventListener('click', () => workspace?.fit());
+  section.querySelector('[data-action="bpmn-fit"]').addEventListener('click', () => renderStep(workspace?.fit()));
+  section.querySelector('[data-action="bpmn-prev"]')?.addEventListener('click', () => renderStep(workspace?.step(-1)));
+  section.querySelector('[data-action="bpmn-next"]')?.addEventListener('click', () => renderStep(workspace?.step(1)));
+  section.querySelectorAll('[data-action="bpmn-meta"]').forEach((button) => {
+    button.addEventListener('click', () => {
+      section.classList.toggle('is-meta-open');
+      app?.classList.remove('is-bpmn-more');
+      section.querySelector('[data-action="bpmn-more"]')?.setAttribute('aria-expanded', 'false');
+    });
+  });
+  section.querySelector('[data-action="bpmn-more"]')?.addEventListener('click', (event) => {
+    const open = !app.classList.contains('is-bpmn-more');
+    app.classList.toggle('is-bpmn-more', open);
+    event.currentTarget.setAttribute('aria-expanded', String(open));
+  });
   section.querySelector('[data-action="bpmn-zoom-in"]').addEventListener('click', () => workspace?.zoom(1.2));
   section.querySelector('[data-action="bpmn-zoom-out"]').addEventListener('click', () => workspace?.zoom(1 / 1.2));
   section.querySelector('[data-action="bpmn-back"]').addEventListener('click', () => section.classList.remove('is-diagram'));
@@ -321,7 +372,7 @@ export function createProcessView({ app, onToast }) {
       : new Intl.DateTimeFormat('es-CO', { timeZone: 'America/Bogota', dateStyle: 'short' }).format(new Date());
     await workspace.exportPng(exportName('png'), {
       logoUrl: light ? '/src/brand/simbolo_negro_on_blanco.png' : '/src/brand/simbolo_mostaza_on_negro.png',
-      footer: `RR ALIADOS · fuente: ${current.meta?.fuente || UNKNOWN} · corte: ${corte} · bpmn.io`,
+      footer: `RR ALIADOS · ${presentSource(current.meta?.fuente)} · corte: ${corte} · bpmn.io`,
     });
     onToast?.('PNG exportado');
   });
@@ -384,7 +435,7 @@ export function createProcessView({ app, onToast }) {
 
   document.addEventListener('atlas-theme', () => workspace?.restyle());
   window.addEventListener('resize', () => {
-    if (!section.hidden) workspace?.fit();
+    if (!section.hidden && workspace) renderStep(workspace.recenter());
   });
 
   return { activate, fit: () => workspace?.fit() };

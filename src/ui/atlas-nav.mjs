@@ -14,12 +14,23 @@ export function bindAtlasNavigation({ app, search, processView }) {
     menuButtons.forEach((button) => button.setAttribute('aria-expanded', 'true'));
   };
 
+  const markBuscar = (active) => {
+    app.querySelectorAll('[data-atlas-section-target="buscar"]').forEach((button) => {
+      button.setAttribute('aria-pressed', String(active));
+    });
+  };
+
   const setSection = (section) => {
     app.dataset.atlasSection = section;
     const processes = app.querySelector('[data-atlas-process]');
     processes.hidden = section !== 'procesos';
+    app.classList.remove('is-tools-open', 'is-bpmn-more');
     app.querySelectorAll('[data-atlas-section-target]').forEach((button) => {
-      if (button.dataset.atlasSectionTarget === 'menu' || button.dataset.atlasSectionTarget === 'buscar') return;
+      if (button.dataset.atlasSectionTarget === 'menu') return;
+      if (button.dataset.atlasSectionTarget === 'buscar') {
+        button.setAttribute('aria-pressed', 'false');
+        return;
+      }
       button.setAttribute('aria-pressed', String(button.dataset.atlasSectionTarget === section));
     });
     closeMenu();
@@ -36,7 +47,9 @@ export function bindAtlasNavigation({ app, search, processView }) {
       }
       if (target === 'buscar') {
         setSection('mapa');
-        search.focus();
+        markBuscar(true);
+        app.querySelectorAll('[data-atlas-section-target="mapa"]').forEach((button) => button.setAttribute('aria-pressed', 'false'));
+        search.focus({ preventScroll: true });
         return;
       }
       setSection(target);
@@ -60,9 +73,20 @@ export function bindAtlasNavigation({ app, search, processView }) {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       closeMenu();
-      app.classList.remove('is-detail-open');
+      app.classList.remove('is-detail-open', 'is-tools-open', 'is-bpmn-more', 'is-meta-open');
+      app.querySelector('[data-atlas-process]')?.classList.remove('is-meta-open');
     }
   });
+
+  const viewport = window.visualViewport;
+  if (viewport) {
+    const syncKeyboard = () => {
+      const covered = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+      app.style.setProperty('--rr-keyboard', `${Math.round(covered)}px`);
+    };
+    viewport.addEventListener('resize', syncKeyboard);
+    viewport.addEventListener('scroll', syncKeyboard);
+  }
 
   setSection('mapa');
   return { setSection, closeMenu };

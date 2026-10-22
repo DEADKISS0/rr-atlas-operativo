@@ -10,7 +10,10 @@ import {
   describeSeed,
   findSensitive,
   parseProcessMeta,
+  presentSource,
   presentValue,
+  purposeFromDocumentation,
+  listLanes,
 } from './process-model.mjs';
 import { rrModdle } from '../bpmn/rr-moddle.mjs';
 import { NODE_COLORS, PALETTE_COLORS } from './atlas-state.mjs';
@@ -86,6 +89,18 @@ test('el descriptor rr del runtime coincide con el json', async () => {
   assert.equal(json.uri, rrModdle.uri);
   assert.equal(json.prefix, rrModdle.prefix);
   assert.deepEqual(json.types.map((type) => type.name), rrModdle.types.map((type) => type.name));
+});
+
+test('la fuente técnica se muestra como ejemplo y el propósito queda legible', () => {
+  const text = `CÓMO NACE UNA ALIANZA
+Prospectos que entran por confianza de terceros, sin costo de adquisición. · corte 2026-09-26
+Dueno del proceso: DESCONOCIDO (el spec no lo declara)
+Fuente: _herramientas/esquemas_bpmn/alianzas.json`;
+  assert.equal(purposeFromDocumentation(text), 'Prospectos que entran por confianza de terceros, sin costo de adquisición.');
+  assert.equal(presentSource('_herramientas/esquemas_bpmn/alianzas.json'), 'Ejemplo anonimizado');
+  assert.equal(presentSource('DESCONOCIDO'), 'Ejemplo anonimizado');
+  const xml = `<bpmn:lane id="a" name="1 · Comercial"></bpmn:lane><bpmn:lane id="b" name="2 · Dirección"></bpmn:lane>`;
+  assert.deepEqual(listLanes(xml), ['1 · Comercial', '2 · Dirección']);
 });
 
 test('los colores de nodo quedan dentro de la paleta oficial', () => {

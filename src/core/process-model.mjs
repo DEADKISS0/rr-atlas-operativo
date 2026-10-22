@@ -46,6 +46,27 @@ export function escapeXml(value) {
     .replace(/"/g, '&quot;');
 }
 
+export function presentSource(value) {
+  const clean = presentValue(value);
+  if (clean === UNKNOWN || /[\\/]|\.(json|bpmn|md)\b/i.test(clean)) return 'Ejemplo anonimizado';
+  return clean;
+}
+
+export function purposeFromDocumentation(text) {
+  const lines = String(text || '').split(/\n/).map((line) => line.trim()).filter(Boolean);
+  const purpose = lines.find((line, index) => index > 0 && !/^(dueño|dueno|owner|kpi|fuente|línea base|linea base)\b/i.test(line));
+  return (purpose || '').replace(/\s*·\s*corte\s+\d{4}-\d{2}-\d{2}.*/i, '').trim();
+}
+
+export function listLanes(xml) {
+  const lanes = [];
+  for (const match of String(xml || '').matchAll(/<bpmn:lane\b([^>]*)>/g)) {
+    const name = attr(match[1], 'name');
+    if (name) lanes.push(name);
+  }
+  return lanes;
+}
+
 export function presentValue(value) {
   const clean = String(value ?? '').trim();
   if (!clean || /^desconocido\b/i.test(clean)) return UNKNOWN;

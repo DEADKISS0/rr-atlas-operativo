@@ -96,7 +96,7 @@ function paint(parent, element) {
     parent.querySelectorAll('rect').forEach((node) => node.setAttribute('stroke-width', '3'));
     addWord(parent, 'se traba', theme.alarm, 8, 16);
   }
-  if (kind === 'entra') addWord(parent, 'entra', theme.stroke, 0, -6);
+  if (kind === 'entra') addWord(parent, 'entra', theme.stroke, 4, Math.max(20, (element.height || 36) - 8));
   if (kind === 'dato') addWord(parent, 'dato', theme.muted, 4, Math.max(16, (element.height || 50) - 6));
   if (kind === 'lane') {
     const pool = element.type === 'bpmn:Participant';

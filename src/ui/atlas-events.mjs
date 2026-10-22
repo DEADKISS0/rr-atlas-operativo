@@ -36,11 +36,25 @@ export function bindAtlasEvents({ root, store, view, knownLinks = [], onToast, a
   root.actions.zoomIn.addEventListener('click', () => view.zoomIn());
   root.actions.zoomOut.addEventListener('click', () => view.zoomOut());
   root.actions.center.addEventListener('click', () => view.center());
+  const app = root.layout.closest('#atlas-app');
+  root.actions.toggleTools?.addEventListener('click', () => {
+    const open = !app?.classList.contains('is-tools-open');
+    app?.classList.toggle('is-tools-open', open);
+    root.actions.toggleTools.setAttribute('aria-expanded', String(open));
+  });
   root.actions.flow.addEventListener('click', () => {
     store.setFilter('Todo');
     store.setQuery('');
-    store.select('comercial');
-    toast('Proceso comercial seleccionado');
+    if (root.search) root.search.value = '';
+    const snapshot = store.getSnapshot();
+    const node = snapshot.state.data.find((item) => item.type === 'Proceso');
+    if (node && store.select(node.id)) {
+      view.frameNode(node.id);
+      toast('Ejemplo de proceso en el centro del mapa');
+    } else {
+      toast('No hay un proceso de ejemplo en este mapa');
+    }
+    app?.classList.remove('is-tools-open');
   });
   root.actions.undo.addEventListener('click', () => store.undo());
   root.actions.redo.addEventListener('click', () => store.redo());

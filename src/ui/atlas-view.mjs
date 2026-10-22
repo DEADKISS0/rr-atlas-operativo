@@ -1,5 +1,5 @@
-import { NODE_COLORS } from '../core/atlas-state.mjs?v=bpmn-1';
-import { createMediaTile, isDirectMedia } from './atlas-media.mjs?v=bpmn-1';
+import { NODE_COLORS } from '../core/atlas-state.mjs?v=bpmn-2';
+import { createMediaTile, isDirectMedia } from './atlas-media.mjs?v=bpmn-2';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -125,7 +125,7 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
       marker.setAttribute('aria-hidden', 'true');
       const kind = document.createElement('span');
       kind.className = 'kind';
-      kind.textContent = node.type;
+      kind.textContent = /ejemplo/i.test(node.title) ? `Ejemplo · ${node.type}` : node.type;
       marker.appendChild(kind);
       if (node.media?.length) {
         const mediaBadge = document.createElement('span');
@@ -204,7 +204,7 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
 
     const kind = document.createElement('span');
     kind.className = 'kind';
-    kind.textContent = `Editar nodo · ${node.id}`;
+    kind.textContent = /ejemplo/i.test(node.title) ? `Ejemplo · ${node.type}` : node.type;
     const heading = document.createElement('h2');
     heading.textContent = node.title;
     root.editor.append(kind, heading);
@@ -399,7 +399,7 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
 
     const notice = document.createElement('p');
     notice.className = 'atlas-notice';
-    notice.textContent = 'Persistencia local validada. La conexión remota queda para una fase posterior.';
+    notice.textContent = 'Los cambios de este mapa se guardan en este navegador.';
     root.editor.appendChild(notice);
   };
 
@@ -409,7 +409,12 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
     const visible = visibleNodes();
     const mediaCount = snapshot.state.data.reduce((total, node) => total + (node.media?.length ?? 0), 0);
     root.count.textContent = `${visible.length} de ${snapshot.state.data.length} nodos · ${snapshot.state.lines.length} conexiones · ${mediaCount} recursos`;
-    root.status.textContent = snapshot.reason === 'init' ? 'Selecciona un nodo para editarlo · Desplazar: fondo · Zoom: rueda' : 'Cambios guardados localmente';
+    const narrow = root.work.clientWidth < 761;
+    if (snapshot.query && !visible.length) root.status.textContent = 'Ningún ejemplo coincide con la búsqueda.';
+    else if (snapshot.reason === 'init') root.status.textContent = narrow
+      ? 'Ejemplos, no datos reales. Arrastra el fondo o pellizca para acercar.'
+      : 'Ejemplos, no datos reales. Arrastra el fondo o usa la rueda para acercar.';
+    else root.status.textContent = 'Cambios guardados en este navegador.';
     root.railButtons.forEach((buttonElement) => {
       buttonElement.setAttribute('aria-pressed', String(buttonElement.dataset.atlasFilter === snapshot.filter));
     });
@@ -418,6 +423,7 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
     renderMinimap(visible);
     renderEditor();
     setWorldTransform();
+    if (snapshot.reason === 'init') requestAnimationFrame(() => frameReadable());
   };
 
   const pan = (event) => {
@@ -480,7 +486,8 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
     event.preventDefault();
     const distance = pinchDistance();
     if (!pinch) pinch = { distance, z: viewport.z };
-    viewport.z = Math.max(.25, Math.min(2.4, pinch.z * (distance / pinch.distance)));
+    const floor = root.work.clientWidth < 761 ? 0.55 : 0.35;
+    viewport.z = Math.max(floor, Math.min(2.4, pinch.z * (distance / pinch.distance)));
     setWorldTransform();
   }, { passive: false });
   const releasePointer = (event) => {
@@ -491,7 +498,8 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
   root.work.addEventListener('pointercancel', releasePointer);
   root.work.addEventListener('wheel', (event) => {
     event.preventDefault();
-    viewport.z = Math.max(.25, Math.min(2.4, viewport.z * (event.deltaY < 0 ? 1.1 : .9)));
+    const floor = root.work.clientWidth < 761 ? 0.55 : 0.35;
+    viewport.z = Math.max(floor, Math.min(2.4, viewport.z * (event.deltaY < 0 ? 1.1 : .9)));
     setWorldTransform();
   }, { passive: false });
 
@@ -503,16 +511,39 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
     setWorldTransform();
   };
 
+  const frameNode = (node) => {
+    if (!node || !root.work.clientWidth) return;
+    const narrow = root.work.clientWidth < 761;
+    const zoom = narrow ? 1 : 0.85;
+    viewport.z = zoom;
+    const cx = (Number(node.x) || 0) + 119;
+    const cy = (Number(node.y) || 0) + 70;
+    viewport.x = root.work.clientWidth / 2 - cx * zoom;
+    viewport.y = root.work.clientHeight * 0.36 - cy * zoom;
+    setWorldTransform();
+  };
+
+  const frameReadable = () => {
+    const visible = visibleNodes();
+    const selected = visible.find((node) => node.id === currentSnapshot.selectedId) || visible[0];
+    frameNode(selected);
+  };
+
   const focusVisible = () => {
     const visible = visibleNodes();
-    if (!visible.length) return;
+    if (!visible.length || !root.work.clientWidth) return;
+    const narrow = root.work.clientWidth < 761;
+    if (narrow || visible.length > 8) {
+      frameNode(visible.find((node) => node.id === currentSnapshot.selectedId) || visible[0]);
+      return;
+    }
     const minX = Math.min(...visible.map((node) => node.x));
     const maxX = Math.max(...visible.map((node) => node.x + 238));
     const minY = Math.min(...visible.map((node) => node.y));
     const maxY = Math.max(...visible.map((node) => node.y + 150));
-    const width = Math.max(320, root.work.clientWidth - 80);
-    const height = Math.max(260, root.work.clientHeight - 120);
-    viewport.z = Math.max(.28, Math.min(1.05, Math.min(width / Math.max(420, maxX - minX), height / Math.max(260, maxY - minY))));
+    const width = Math.max(320, root.work.clientWidth - 48);
+    const height = Math.max(220, root.work.clientHeight - 48);
+    viewport.z = Math.max(0.7, Math.min(1.05, Math.min(width / Math.max(280, maxX - minX), height / Math.max(180, maxY - minY))));
     viewport.x = root.work.clientWidth / 2 - ((minX + maxX) / 2) * viewport.z;
     viewport.y = root.work.clientHeight / 2 - ((minY + maxY) / 2) * viewport.z;
     setWorldTransform();
@@ -539,14 +570,19 @@ export function createAtlasView({ root, store, onLinkRequest, onMediaRequest, on
       refreshMap();
     },
     focusVisible,
+    frameNode(id) { frameNode(getNode(id) || visibleNodes()[0]); },
     toggleWires() {
       wiresVisible = !wiresVisible;
       refreshMap();
       return wiresVisible;
     },
-    center() { viewport.x = 38; viewport.y = 30; viewport.z = .65; setWorldTransform(); },
-    zoomIn() { viewport.z = Math.min(2, viewport.z * 1.2); setWorldTransform(); },
-    zoomOut() { viewport.z = Math.max(.25, viewport.z / 1.2); setWorldTransform(); },
+    center() { frameReadable(); },
+    zoomIn() { viewport.z = Math.min(2.4, viewport.z * 1.2); setWorldTransform(); },
+    zoomOut() {
+      const floor = root.work.clientWidth < 761 ? 0.55 : 0.35;
+      viewport.z = Math.max(floor, viewport.z / 1.2);
+      setWorldTransform();
+    },
     getSnapshot: () => clone(currentSnapshot),
   });
 }

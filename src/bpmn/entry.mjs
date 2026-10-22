@@ -133,6 +133,97 @@ export function createBpmnWorkspace({ container, onReport }) {
     });
   }
 
+  let stepIndex = 0;
+  const narrow = () => container.clientWidth < 761;
+
+  function flowElements() {
+    if (!viewer) return [];
+    const registry = viewer.get('elementRegistry');
+    const elements = registry.filter((element) => !element.labelTarget && !element.waypoints && /Event$|Task$|Gateway$/.test(element.type || ''));
+    const start = elements.find((element) => element.type === 'bpmn:StartEvent') || elements[0];
+    if (!start) return elements;
+    const known = new Set(elements.map((element) => element.id));
+    const next = new Map();
+    registry.filter((element) => element.waypoints).forEach((flow) => {
+      const source = flow.source?.id;
+      const target = flow.target?.id;
+      if (!source || !target || !known.has(target)) return;
+      const list = next.get(source) || [];
+      list.push(target);
+      next.set(source, list);
+    });
+    const ordered = [];
+    const seen = new Set();
+    const queue = [start.id];
+    while (queue.length) {
+      const id = queue.shift();
+      if (!id || seen.has(id) || !known.has(id)) continue;
+      seen.add(id);
+      ordered.push(registry.get(id));
+      for (const target of next.get(id) || []) queue.push(target);
+    }
+    for (const element of elements) if (!seen.has(element.id)) ordered.push(element);
+    return ordered;
+  }
+
+  function laneOf(element) {
+    const lanes = viewer.get('elementRegistry').filter((item) => item.type === 'bpmn:Lane');
+    const lane = lanes.find((item) => element.x >= item.x && element.x <= item.x + item.width && element.y >= item.y && element.y <= item.y + item.height);
+    return lane?.businessObject?.name || '';
+  }
+
+  function intersects(a, b) {
+    return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+  }
+
+  function nudgeLabels() {
+    if (!viewer) return;
+    const registry = viewer.get('elementRegistry');
+    const shapes = registry.filter((element) => !element.labelTarget && !element.waypoints && element.width && element.type !== 'bpmn:Lane' && element.type !== 'bpmn:Participant');
+    const labels = registry.filter((element) => element.labelTarget && element.width);
+    for (const label of labels) {
+      for (let guard = 0; guard < 6; guard += 1) {
+        const shape = shapes.find((item) => item.id !== label.labelTarget?.id && intersects(label, item));
+        if (!shape) break;
+        label.y = shape.y + shape.height + 8;
+        const gfx = registry.getGraphics(label);
+        gfx?.setAttribute('transform', `matrix(1 0 0 1 ${label.x} ${label.y})`);
+      }
+    }
+  }
+
+  function describeStep(elements = flowElements()) {
+    const element = elements[stepIndex];
+    return {
+      index: elements.length ? stepIndex : 0,
+      total: elements.length,
+      name: element?.businessObject?.name || 'Inicio',
+      lane: element ? laneOf(element) : '',
+    };
+  }
+
+  function showStep(index) {
+    const elements = flowElements();
+    if (!viewer || !elements.length) return { index: 0, total: 0, name: 'Sin pasos', lane: '' };
+    stepIndex = Math.max(0, Math.min(elements.length - 1, index));
+    const canvas = viewer.get('canvas');
+    if (narrow()) canvas.zoom(Math.max(canvas.zoom() || 1, 1.15));
+    canvas.scrollToElement(elements[stepIndex], { top: 72, right: 28, bottom: 88, left: 28 });
+    nudgeLabels();
+    return describeStep(elements);
+  }
+
+  function frameInitial() {
+    if (!viewer) return { index: 0, total: 0, name: '', lane: '' };
+    if (!narrow()) {
+      viewer.get('canvas').zoom('fit-viewport', 'auto');
+      stepIndex = 0;
+      nudgeLabels();
+      return describeStep();
+    }
+    return showStep(0);
+  }
+
   return {
     setDebt(value) { debt = value; },
     async open(xml, options = {}) {
@@ -145,21 +236,31 @@ export function createBpmnWorkspace({ container, onReport }) {
         return report;
       }
       await viewer.importXML(xml);
-      viewer.get('canvas').zoom('fit-viewport', 'auto');
-      onReport?.(report);
-      return report;
+      const step = frameInitial();
+      onReport?.({ ...report, step });
+      return { ...report, step };
     },
-    fit() { viewer?.get('canvas').zoom('fit-viewport', 'auto'); },
+    fit() { return frameInitial(); },
+    recenter() { return showStep(stepIndex); },
+    step(delta) { return showStep(stepIndex + delta); },
     zoom(factor) {
       const canvas = viewer?.get('canvas');
       if (!canvas) return;
-      canvas.zoom(Math.max(0.2, Math.min(4, canvas.zoom() * factor)));
+      const floor = narrow() ? 0.55 : 0.2;
+      canvas.zoom(Math.max(floor, Math.min(2.6, canvas.zoom() * factor)));
     },
     focus(id) {
       if (!viewer || !id) return;
+      const elements = flowElements();
+      const index = elements.findIndex((element) => element.id === id);
+      if (index >= 0) {
+        showStep(index);
+        return;
+      }
       const element = viewer.get('elementRegistry').get(id);
       if (!element) return;
-      viewer.get('canvas').scrollToElement(element, { top: 24, right: 24, bottom: 24, left: 24 });
+      if (narrow()) viewer.get('canvas').zoom(Math.max(viewer.get('canvas').zoom() || 1, 1.15));
+      viewer.get('canvas').scrollToElement(element, { top: 72, right: 28, bottom: 88, left: 28 });
       try { viewer.get('selection').select(element); } catch { /* el visor no selecciona */ }
     },
     restyle,

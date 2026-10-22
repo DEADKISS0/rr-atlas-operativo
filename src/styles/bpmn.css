@@ -42,8 +42,14 @@
   border-radius: 3px;
   opacity: 1 !important;
 }
+.atlas-lane-legend { display: flex; gap: 6px; margin: 0; padding: 6px 8px; overflow: auto; background: var(--rr-panel); border-bottom: 1px solid var(--rr-orchid); }
+@media (min-width: 761px) {
+  .atlas-lane-legend { display: none !important; }
+}
+.atlas-lane-legend span { flex: 0 0 auto; min-height: 32px; display: inline-flex; align-items: center; padding: 4px 8px; border: 1px solid var(--rr-orchid); color: var(--rr-paper); font-size: 14px; }
 @media (max-width: 760px) {
   .atlas-button--icon { width: 44px; min-width: 44px; min-height: 44px; }
   .djs-palette .entry,
   .djs-context-pad .entry { width: 44px; height: 44px; }
+  .atlas-bpmn-canvas .rr-lane-label { display: none; }
 }
