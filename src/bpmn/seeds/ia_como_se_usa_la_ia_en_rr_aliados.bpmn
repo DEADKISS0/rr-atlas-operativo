@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="def_flujo_ia_y_herramientas" targetNamespace="https://rraliados.co/bpmn" exporter="RR Aliados · bpmn_xml_v2.py" exporterVersion="2.0">
+  <bpmn:collaboration id="collab_1">
+    <bpmn:participant id="part_1" name="CÓMO SE USA LA IA EN RR ALIADOS" processRef="proc_flujo_ia_y_herramientas"/>
+  </bpmn:collaboration>
+  <bpmn:process id="proc_flujo_ia_y_herramientas" name="CÓMO SE USA LA IA EN RR ALIADOS" isExecutable="false">
+    <bpmn:documentation>CÓMO SE USA LA IA EN RR ALIADOS
+Herramientas que hacen más rápido el trabajo de todos, sin costo nuevo. Siete etapas. · corte 2026-09-26
+Dueno del proceso: DESCONOCIDO (el spec no lo declara)
+KPI: DESCONOCIDO (el spec no lo declara)
+Fuente: _herramientas/esquemas_bpmn/ia_como_se_usa_la_ia_en_rr_aliados.json</bpmn:documentation>
+    <bpmn:laneSet id="laneset_1">
+      <bpmn:lane id="lane_1" name="1 · Quién lo pide">
+        <bpmn:flowNodeRef>e_ini</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_existe</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_reusar</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_2" name="2 · Construcción">
+        <bpmn:flowNodeRef>t_proveedor</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_permiso</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_descarta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_skill</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_prueba</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_detecta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_instala</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_docs</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>e_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_3" name="3 · Las reglas que no se rompen"/>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="e_ini" name="Alguien hace algo pesado">
+      <bpmn:outgoing>sf_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="g_existe" name="2. ¿Ya hay una herramienta?">
+      <bpmn:incoming>sf_1</bpmn:incoming>
+      <bpmn:outgoing>sf_2</bpmn:outgoing>
+      <bpmn:outgoing>sf_3</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="t_reusar" name="Se reusa la que ya está">
+      <bpmn:documentation>No se reinventa lo que ya existe. Se documenta y listo.</bpmn:documentation>
+      <bpmn:incoming>sf_2</bpmn:incoming>
+      <bpmn:outgoing>sf_4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_proveedor" name="3. Se decide el proveedor">
+      <bpmn:documentation>Se elige proveedor y modelo según lo aprobado. No se prueba nada nuevo sin permiso.</bpmn:documentation>
+      <bpmn:incoming>sf_3</bpmn:incoming>
+      <bpmn:incoming>sf_8</bpmn:incoming>
+      <bpmn:outgoing>sf_5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g_permiso" name="¿Está aprobado?">
+      <bpmn:incoming>sf_5</bpmn:incoming>
+      <bpmn:outgoing>sf_6</bpmn:outgoing>
+      <bpmn:outgoing>sf_7</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="t_descarta" name="Se descarta">
+      <bpmn:documentation>Un proveedor no aprobado no entra, por bueno que parezca. Se busca otro que sí lo esté.</bpmn:documentation>
+      <bpmn:incoming>sf_6</bpmn:incoming>
+      <bpmn:outgoing>sf_8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_skill" name="4. Se construye la skill">
+      <bpmn:documentation>Una skill con nombre claro y description útil.</bpmn:documentation>
+      <bpmn:incoming>sf_7</bpmn:incoming>
+      <bpmn:incoming>sf_11</bpmn:incoming>
+      <bpmn:outgoing>sf_9</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_prueba" name="5. Se prueba con error real">
+      <bpmn:documentation>Se le planta un error y se ve si lo detecta. Si no detecta nada, no sirve.</bpmn:documentation>
+      <bpmn:incoming>sf_9</bpmn:incoming>
+      <bpmn:outgoing>sf_10</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g_detecta" name="¿Lo detectó?">
+      <bpmn:incoming>sf_10</bpmn:incoming>
+      <bpmn:outgoing>sf_11</bpmn:outgoing>
+      <bpmn:outgoing>sf_12</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="t_instala" name="6. Se instala donde corresponde">
+      <bpmn:documentation>En la carpeta del proyecto, no global. Global solo lo que sirve para todos.</bpmn:documentation>
+      <bpmn:incoming>sf_12</bpmn:incoming>
+      <bpmn:outgoing>sf_13</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_docs" name="7. Se documenta">
+      <bpmn:documentation>Qué hace, cuándo se usa y cómo se quita. Sin esto, nadie la va a usar.</bpmn:documentation>
+      <bpmn:incoming>sf_4</bpmn:incoming>
+      <bpmn:incoming>sf_13</bpmn:incoming>
+      <bpmn:outgoing>sf_14</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="e_fin" name="Queda documentada">
+      <bpmn:incoming>sf_14</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:dataObject id="do_d_openrouter"/>
+    <bpmn:dataObjectReference id="d_openrouter" dataObjectRef="do_d_openrouter" name="OpenRouter">
+      <bpmn:documentation>Decisión firme del 26/09: no se usa. Ni se lee, ni se escribe, ni se cita.</bpmn:documentation>
+    </bpmn:dataObjectReference>
+    <bpmn:dataObject id="do_d_flota"/>
+    <bpmn:dataObjectReference id="d_flota" dataObjectRef="do_d_flota" name="La flota">
+      <bpmn:documentation>10 agentes: 9 operativos más pigui, que es compañero informal de Dirección y no trabaja.</bpmn:documentation>
+    </bpmn:dataObjectReference>
+    <bpmn:sequenceFlow id="sf_1" sourceRef="e_ini" targetRef="g_existe"/>
+    <bpmn:sequenceFlow id="sf_2" sourceRef="g_existe" targetRef="t_reusar" name="sí"/>
+    <bpmn:sequenceFlow id="sf_3" sourceRef="g_existe" targetRef="t_proveedor" name="no"/>
+    <bpmn:sequenceFlow id="sf_4" sourceRef="t_reusar" targetRef="t_docs"/>
+    <bpmn:sequenceFlow id="sf_5" sourceRef="t_proveedor" targetRef="g_permiso"/>
+    <bpmn:sequenceFlow id="sf_6" sourceRef="g_permiso" targetRef="t_descarta" name="no"/>
+    <bpmn:sequenceFlow id="sf_7" sourceRef="g_permiso" targetRef="t_skill" name="sí"/>
+    <bpmn:sequenceFlow id="sf_8" sourceRef="t_descarta" targetRef="t_proveedor"/>
+    <bpmn:sequenceFlow id="sf_9" sourceRef="t_skill" targetRef="t_prueba"/>
+    <bpmn:sequenceFlow id="sf_10" sourceRef="t_prueba" targetRef="g_detecta"/>
+    <bpmn:sequenceFlow id="sf_11" sourceRef="g_detecta" targetRef="t_skill" name="no: hay que rehacerla"/>
+    <bpmn:sequenceFlow id="sf_12" sourceRef="g_detecta" targetRef="t_instala" name="sí"/>
+    <bpmn:sequenceFlow id="sf_13" sourceRef="t_instala" targetRef="t_docs"/>
+    <bpmn:sequenceFlow id="sf_14" sourceRef="t_docs" targetRef="e_fin"/>
+    <bpmn:association id="as_1" sourceRef="d_openrouter" targetRef="g_permiso" associationDirection="One">
+      <bpmn:documentation>la lista</bpmn:documentation>
+    </bpmn:association>
+    <bpmn:association id="as_2" sourceRef="d_flota" targetRef="g_existe" associationDirection="One">
+      <bpmn:documentation>qué ya existe</bpmn:documentation>
+    </bpmn:association>
+    <bpmn:textAnnotation id="nota_1">
+      <bpmn:text>AQUÍ SE TRABA: un proveedor de IA no aprobado, o una skill sin probar, mete manos en el trabajo y nadie lo nota. Decisión firme del 26/09: OpenRouter no se usa — ni se lee, ni se escribe, ni se cita.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_1" sourceRef="nota_1" targetRef="g_permiso"/>
+    <bpmn:textAnnotation id="nota_2">
+      <bpmn:text>UNA SKILL SIN PRUEBA NO EXISTE: si no se le planta un error y lo detecta, no se instala. Probar es parte de construir, no un extra.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_2" sourceRef="nota_2" targetRef="t_prueba"/>
+    <bpmn:textAnnotation id="nota_3">
+      <bpmn:text>PERMISOS, NO CONFIANZA: una skill es código de un tercero. Se lee antes de instalar y se instala donde no hace daño.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_3" sourceRef="nota_3" targetRef="t_instala"/>
+    <bpmn:textAnnotation id="nota_4">
+      <bpmn:text>HUECO: pigui no está auditado. Es el compañero informal de Dirección y nadie revisó qué hace ni qué puede tocar. HUECO: no hay política de cuota — el 26/09 los 10 bots quedaron caídos por cuota. Hay fallback, pero no hay límite de gasto ni de uso.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_4" sourceRef="nota_4" targetRef="d_flota"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="diagrama_1">
+    <bpmndi:BPMNPlane id="plano_1" bpmnElement="collab_1">
+      <bpmndi:BPMNShape id="part_1_di" bpmnElement="part_1" isHorizontal="true">
+        <dc:Bounds x="100" y="80" width="2220" height="730"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_1_di" bpmnElement="lane_1" isHorizontal="true">
+        <dc:Bounds x="130" y="80" width="2190" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_2_di" bpmnElement="lane_2" isHorizontal="true">
+        <dc:Bounds x="130" y="280" width="2190" height="330"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_3_di" bpmnElement="lane_3" isHorizontal="true">
+        <dc:Bounds x="130" y="610" width="2190" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_ini_di" bpmnElement="e_ini">
+        <dc:Bounds x="257" y="127" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="205" y="167" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_existe_di" bpmnElement="g_existe" isMarkerVisible="true">
+        <dc:Bounds x="460" y="120" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="415" y="174" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_reusar_di" bpmnElement="t_reusar" bioc:stroke="#4d9e5c">
+        <dc:Bounds x="620" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_proveedor_di" bpmnElement="t_proveedor" bioc:stroke="#e05252">
+        <dc:Bounds x="620" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_permiso_di" bpmnElement="g_permiso" isMarkerVisible="true">
+        <dc:Bounds x="880" y="320" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="835" y="374" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_descarta_di" bpmnElement="t_descarta">
+        <dc:Bounds x="1040" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_skill_di" bpmnElement="t_skill">
+        <dc:Bounds x="1040" y="435" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_prueba_di" bpmnElement="t_prueba" bioc:stroke="#e05252">
+        <dc:Bounds x="1250" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_detecta_di" bpmnElement="g_detecta" isMarkerVisible="true">
+        <dc:Bounds x="1510" y="320" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1465" y="374" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_instala_di" bpmnElement="t_instala">
+        <dc:Bounds x="1670" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_docs_di" bpmnElement="t_docs" bioc:stroke="#4d9e5c">
+        <dc:Bounds x="1880" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_fin_di" bpmnElement="e_fin">
+        <dc:Bounds x="2147" y="327" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2095" y="367" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="d_openrouter_di" bpmnElement="d_openrouter">
+        <dc:Bounds x="887" y="650" width="36" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="835" y="704" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="d_flota_di" bpmnElement="d_flota">
+        <dc:Bounds x="467" y="650" width="36" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="415" y="704" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="sf_1_di" bpmnElement="sf_1">
+        <di:waypoint x="293" y="145"/>
+        <di:waypoint x="460" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_2_di" bpmnElement="sf_2">
+        <di:waypoint x="510" y="145"/>
+        <di:waypoint x="620" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_3_di" bpmnElement="sf_3">
+        <di:waypoint x="510" y="145"/>
+        <di:waypoint x="600" y="145"/>
+        <di:waypoint x="600" y="345"/>
+        <di:waypoint x="620" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_4_di" bpmnElement="sf_4">
+        <di:waypoint x="770" y="145"/>
+        <di:waypoint x="1860" y="145"/>
+        <di:waypoint x="1860" y="345"/>
+        <di:waypoint x="1880" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_5_di" bpmnElement="sf_5">
+        <di:waypoint x="770" y="345"/>
+        <di:waypoint x="880" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_6_di" bpmnElement="sf_6">
+        <di:waypoint x="930" y="345"/>
+        <di:waypoint x="1040" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_7_di" bpmnElement="sf_7">
+        <di:waypoint x="930" y="345"/>
+        <di:waypoint x="1020" y="345"/>
+        <di:waypoint x="1020" y="475"/>
+        <di:waypoint x="1040" y="475"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_8_di" bpmnElement="sf_8">
+        <di:waypoint x="1115" y="385"/>
+        <di:waypoint x="1115" y="598"/>
+        <di:waypoint x="695" y="598"/>
+        <di:waypoint x="695" y="385"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_9_di" bpmnElement="sf_9">
+        <di:waypoint x="1190" y="475"/>
+        <di:waypoint x="1230" y="475"/>
+        <di:waypoint x="1230" y="345"/>
+        <di:waypoint x="1250" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_10_di" bpmnElement="sf_10">
+        <di:waypoint x="1400" y="345"/>
+        <di:waypoint x="1510" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_11_di" bpmnElement="sf_11">
+        <di:waypoint x="1535" y="370"/>
+        <di:waypoint x="1535" y="598"/>
+        <di:waypoint x="1115" y="598"/>
+        <di:waypoint x="1115" y="515"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_12_di" bpmnElement="sf_12">
+        <di:waypoint x="1560" y="345"/>
+        <di:waypoint x="1670" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_13_di" bpmnElement="sf_13">
+        <di:waypoint x="1820" y="345"/>
+        <di:waypoint x="1880" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_14_di" bpmnElement="sf_14">
+        <di:waypoint x="2030" y="345"/>
+        <di:waypoint x="2147" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_1_di" bpmnElement="as_1">
+        <di:waypoint x="905" y="650"/>
+        <di:waypoint x="905" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_2_di" bpmnElement="as_2">
+        <di:waypoint x="485" y="650"/>
+        <di:waypoint x="485" y="170"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="nota_1_di" bpmnElement="nota_1">
+        <dc:Bounds x="880" y="850" width="230" height="104"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_2_di" bpmnElement="nota_2">
+        <dc:Bounds x="1250" y="850" width="230" height="74"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_3_di" bpmnElement="nota_3">
+        <dc:Bounds x="1670" y="850" width="230" height="74"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_4_di" bpmnElement="nota_4">
+        <dc:Bounds x="467" y="850" width="230" height="119"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="as_nota_1_di" bpmnElement="as_nota_1">
+        <di:waypoint x="995" y="850"/>
+        <di:waypoint x="905" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_2_di" bpmnElement="as_nota_2">
+        <di:waypoint x="1365" y="850"/>
+        <di:waypoint x="1325" y="385"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_3_di" bpmnElement="as_nota_3">
+        <di:waypoint x="1785" y="850"/>
+        <di:waypoint x="1745" y="385"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_4_di" bpmnElement="as_nota_4">
+        <di:waypoint x="582" y="850"/>
+        <di:waypoint x="485" y="700"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,434 @@
+[
+ {
+  "archivo": "alianzas_como_nace_una_alianza.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 0,
+  "lint_W": 2,
+  "lint_reglas": {
+   "fake-join": [
+    "t_registra",
+    "e_fin"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 11,
+  "secuencias": 11,
+  "asociaciones": 5,
+  "lanes": 3,
+  "di_ok": true
+ },
+ {
+  "archivo": "clientes_que_pasa_despues_de_entregar.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 1,
+  "lint_W": 1,
+  "lint_reglas": {
+   "fake-join": [
+    "e_fin"
+   ],
+   "no-gateway-join-fork": [
+    "g_vida"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 11,
+  "secuencias": 12,
+  "asociaciones": 4,
+  "lanes": 2,
+  "di_ok": true
+ },
+ {
+  "archivo": "clientes_que_pasa_despues_de_que_firman.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 1,
+  "lint_W": 1,
+  "lint_reglas": {
+   "no-gateway-join-fork": [
+    "g_listo"
+   ],
+   "superfluous-label": [
+    "sf_6"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 10,
+  "secuencias": 9,
+  "asociaciones": 4,
+  "lanes": 2,
+  "di_ok": true
+ },
+ {
+  "archivo": "desarrollo_como_llega_un_producto_de_software_a_produccion.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 0,
+  "lint_W": 3,
+  "lint_reglas": {
+   "fake-join": [
+    "t_impl",
+    "t_deploy"
+   ],
+   "superfluous-label": [
+    "sf_2"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 14,
+  "secuencias": 14,
+  "asociaciones": 4,
+  "lanes": 3,
+  "di_ok": true
+ },
+ {
+  "archivo": "finanzas_como_entra_un_peso_a_la_cuenta.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 0,
+  "lint_W": 2,
+  "lint_reglas": {
+   "fake-join": [
+    "t_caja"
+   ],
+   "superfluous-label": [
+    "sf_3"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 10,
+  "secuencias": 10,
+  "asociaciones": 4,
+  "lanes": 2,
+  "di_ok": true
+ },
+ {
+  "archivo": "finanzas_como_entra_y_se_sale_la_plata.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 0,
+  "lint_W": 5,
+  "lint_reglas": {
+   "fake-join": [
+    "t_informa"
+   ],
+   "superfluous-label": [
+    "sf_2",
+    "sf_3",
+    "sf_9",
+    "sf_12"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 14,
+  "secuencias": 12,
+  "asociaciones": 6,
+  "lanes": 3,
+  "di_ok": true
+ },
+ {
+  "archivo": "finanzas_como_se_le_paga_a_alguien.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 1,
+  "lint_W": 2,
+  "lint_reglas": {
+   "no-gateway-join-fork": [
+    "g_firma"
+   ],
+   "superfluous-label": [
+    "sf_2",
+    "sf_3"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 10,
+  "secuencias": 9,
+  "asociaciones": 4,
+  "lanes": 2,
+  "di_ok": true
+ },
+ {
+  "archivo": "finanzas_la_quincena.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 1,
+  "lint_W": 2,
+  "lint_reglas": {
+   "no-gateway-join-fork": [
+    "g_abre"
+   ],
+   "superfluous-label": [
+    "sf_8",
+    "sf_13"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 13,
+  "secuencias": 14,
+  "asociaciones": 6,
+  "lanes": 4,
+  "di_ok": true
+ },
+ {
+  "archivo": "gobierno_como_se_gobierna_la_documentacion.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 1,
+  "lint_W": 7,
+  "lint_reglas": {
+   "fake-join": [
+    "t_dup"
+   ],
+   "no-gateway-join-fork": [
+    "g_dueno"
+   ],
+   "superfluous-label": [
+    "sf_5",
+    "sf_6",
+    "sf_7",
+    "sf_8",
+    "sf_9",
+    "sf_13"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 16,
+  "secuencias": 13,
+  "asociaciones": 10,
+  "lanes": 2,
+  "di_ok": true
+ },
+ {
+  "archivo": "ia_como_se_convierte_un_trabajo_repetitivo_en_un_agente.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 0,
+  "lint_W": 1,
+  "lint_reglas": {
+   "fake-join": [
+    "t_fuente"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 11,
+  "secuencias": 10,
+  "asociaciones": 4,
+  "lanes": 2,
+  "di_ok": true
+ },
+ {
+  "archivo": "ia_como_se_usa_la_ia_en_rr_aliados.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 0,
+  "lint_W": 3,
+  "lint_reglas": {
+   "fake-join": [
+    "t_proveedor",
+    "t_skill",
+    "t_docs"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 14,
+  "secuencias": 14,
+  "asociaciones": 6,
+  "lanes": 3,
+  "di_ok": true
+ },
+ {
+  "archivo": "informacion_de_donde_sale_la_respuesta.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 0,
+  "lint_W": 5,
+  "lint_reglas": {
+   "fake-join": [
+    "t_busca",
+    "t_fuente",
+    "e_fin"
+   ],
+   "superfluous-label": [
+    "sf_1",
+    "sf_11"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 14,
+  "secuencias": 15,
+  "asociaciones": 5,
+  "lanes": 3,
+  "di_ok": true
+ },
+ {
+  "archivo": "legal_como_se_firma_un_contrato.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 1,
+  "lint_W": 1,
+  "lint_reglas": {
+   "fake-join": [
+    "t_aprueba"
+   ],
+   "no-gateway-join-fork": [
+    "g_firmado"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 14,
+  "secuencias": 13,
+  "asociaciones": 6,
+  "lanes": 3,
+  "di_ok": true
+ },
+ {
+  "archivo": "produccion_como_se_hace_una_pieza.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 0,
+  "lint_W": 1,
+  "lint_reglas": {
+   "fake-join": [
+    "t_ideas"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 15,
+  "secuencias": 14,
+  "asociaciones": 5,
+  "lanes": 3,
+  "di_ok": true
+ },
+ {
+  "archivo": "soporte_como_se_resuelve_un_problema_de_un_cliente.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 2,
+  "lint_W": 3,
+  "lint_reglas": {
+   "fake-join": [
+    "t_arregla"
+   ],
+   "no-gateway-join-fork": [
+    "g_ayuda",
+    "g_ok"
+   ],
+   "superfluous-label": [
+    "sf_2",
+    "sf_15"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 14,
+  "secuencias": 16,
+  "asociaciones": 4,
+  "lanes": 3,
+  "di_ok": true
+ },
+ {
+  "archivo": "ventas_como_una_oportunidad_se_convierte_en_cliente.bpmn",
+  "moddle_ok": true,
+  "moddle_warnings": 0,
+  "moddle_detalle": [],
+  "lint_E": 0,
+  "lint_W": 5,
+  "lint_reglas": {
+   "fake-join": [
+    "t_negocia"
+   ],
+   "superfluous-label": [
+    "sf_2",
+    "sf_3",
+    "sf_4",
+    "sf_9"
+   ]
+  },
+  "tiene_DI": true,
+  "sin_shape": [],
+  "sin_edge": [],
+  "solapes": [],
+  "fuera_de_lane": [],
+  "nodos": 13,
+  "secuencias": 11,
+  "asociaciones": 6,
+  "lanes": 3,
+  "di_ok": true
+ }
+]

@@ -36,11 +36,29 @@ export function bindAtlasEvents({ root, store, view, knownLinks = [], onToast, a
   root.actions.zoomIn.addEventListener('click', () => view.zoomIn());
   root.actions.zoomOut.addEventListener('click', () => view.zoomOut());
   root.actions.center.addEventListener('click', () => view.center());
+  root.actions.locate?.addEventListener('click', () => {
+    view.center();
+    toast('Nodo seleccionado en el centro');
+  });
+  const app = root.layout.closest('#atlas-app');
+  root.actions.toggleTools?.addEventListener('click', () => {
+    const open = !app?.classList.contains('is-tools-open');
+    app?.classList.toggle('is-tools-open', open);
+    root.actions.toggleTools.setAttribute('aria-expanded', String(open));
+  });
   root.actions.flow.addEventListener('click', () => {
     store.setFilter('Todo');
     store.setQuery('');
-    store.select('comercial');
-    toast('Proceso comercial seleccionado');
+    if (root.search) root.search.value = '';
+    const snapshot = store.getSnapshot();
+    const node = snapshot.state.data.find((item) => item.type === 'Proceso');
+    if (node && store.select(node.id)) {
+      view.frameNode(node.id);
+      toast('Proceso en el centro del mapa');
+    } else {
+      toast('No hay un proceso de ejemplo en este mapa');
+    }
+    app?.classList.remove('is-tools-open');
   });
   root.actions.undo.addEventListener('click', () => store.undo());
   root.actions.redo.addEventListener('click', () => store.redo());
@@ -147,11 +165,12 @@ export function bindAtlasEvents({ root, store, view, knownLinks = [], onToast, a
   });
 
   document.addEventListener('click', (event) => {
-    if (!root.settings.hidden && !root.settings.contains(event.target) && event.target !== root.actions.toggleSettings) {
+    if (event.target instanceof Element && event.target.matches('input[type="file"]')) return;
+    if (!root.settings.hidden && !root.settings.contains(event.target) && !root.actions.toggleSettings.contains(event.target)) {
       root.settings.hidden = true;
       root.actions.toggleSettings.setAttribute('aria-expanded', 'false');
     }
-    if (!root.drawMenu.hidden && !root.drawMenu.contains(event.target) && event.target !== root.actions.draw) {
+    if (!root.drawMenu.hidden && !root.drawMenu.contains(event.target) && !root.actions.draw.contains(event.target)) {
       root.drawMenu.hidden = true;
       root.actions.draw.setAttribute('aria-expanded', 'false');
     }

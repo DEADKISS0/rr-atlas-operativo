@@ -18,5 +18,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Run foundation checks
+          cache: npm
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Comprobar la base
         run: npm run check
+      - name: Validar diagramas BPMN
+        run: npm run lint:bpmn

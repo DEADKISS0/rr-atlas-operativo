@@ -1,0 +1,256 @@
+/* Movimiento de producto: 150–300 ms, curva tipo resorte.
+   reduced-motion conserva el estado y apaga el desplazamiento. */
+
+:root {
+  --rr-ease: cubic-bezier(.2, .9, .2, 1);
+  --rr-motion: 200ms;
+  --rr-press-depth: 4px;
+}
+
+::selection { background: var(--rr-fuchsia); color: var(--rr-paper-fixed); }
+:focus-visible { outline: 2px solid var(--rr-focus); outline-offset: 2px; }
+
+button.rr-press {
+  position: relative;
+  display: inline-flex;
+  width: auto;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 0 var(--rr-press-depth);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  transform: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+button.rr-press:hover,
+button.rr-press:active,
+button.rr-press[aria-pressed="true"],
+body.atlas-theme-light button.rr-press:hover,
+.atlas-rail button.rr-press:hover,
+.atlas-rail button.rr-press[aria-pressed="true"],
+.atlas-tabbar button.rr-press[aria-pressed="true"],
+.atlas-process-card.rr-press[aria-pressed="true"] {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  transform: none;
+  color: inherit;
+}
+.rr-press-shadow {
+  position: absolute;
+  inset: 0 0 var(--rr-press-depth) 0;
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--rr-ink-fixed) 82%, var(--rr-orchid));
+  pointer-events: none;
+}
+.rr-press-face {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--rr-orchid);
+  border-radius: 10px;
+  background: var(--rr-button);
+  color: var(--rr-paper);
+  text-align: center;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: manual;
+  transition: transform var(--rr-motion) var(--rr-ease);
+}
+.rr-press[data-pressed] .rr-press-face { transform: translateY(var(--rr-press-depth)); }
+.rr-press:focus-visible .rr-press-face { outline: 2px solid var(--rr-focus); outline-offset: -2px; }
+.rr-press:disabled { opacity: .45; }
+button.rr-press:hover .rr-press-face,
+body.atlas-theme-light button.rr-press:hover .rr-press-face { background: var(--rr-button-hover); }
+.rr-press.atlas-button--primary .rr-press-face,
+button.rr-press.atlas-button--primary:hover .rr-press-face {
+  background: var(--rr-mustard);
+  border-color: var(--rr-mustard);
+  color: var(--rr-ink-fixed);
+}
+.rr-press.atlas-button--danger .rr-press-face,
+button.rr-press.atlas-button--danger:hover .rr-press-face {
+  background: var(--rr-fuchsia);
+  border-color: var(--rr-fuchsia);
+  color: var(--rr-paper-fixed);
+}
+.rr-press.atlas-button--icon { width: 44px; min-width: 44px; }
+.rr-press.atlas-button--icon .rr-press-face { width: 100%; min-width: 0; padding-inline: 0; }
+.atlas-rail .rr-press,
+.atlas-tabbar .rr-press,
+.atlas-settings-panel .rr-press,
+.atlas-toolbar-extra .rr-press,
+.atlas-process-list .rr-press,
+.atlas-process-actions .rr-press { width: 100%; }
+.atlas-tabbar .rr-press[aria-pressed="true"] .rr-press-face,
+.atlas-rail .rr-press[aria-pressed="true"] .rr-press-face,
+.atlas-process-card.rr-press[aria-pressed="true"] .rr-press-face,
+.atlas-tabbar button.rr-press[aria-pressed="true"]:hover .rr-press-face,
+.atlas-rail button.rr-press[aria-pressed="true"]:hover .rr-press-face,
+.atlas-process-card.rr-press[aria-pressed="true"]:hover .rr-press-face {
+  background: var(--rr-fuchsia);
+  border-color: var(--rr-fuchsia);
+  color: var(--rr-paper-fixed);
+}
+.atlas-tabbar button.is-tour-target .rr-press-face {
+  border-color: var(--rr-mustard);
+  box-shadow: inset 0 0 0 2px var(--rr-mustard);
+  outline: none;
+}
+.atlas-process-card .rr-press-face,
+.atlas-lint-item .rr-press-face {
+  display: block;
+  text-align: left;
+  white-space: normal;
+}
+.atlas-rail .rr-press-face,
+.atlas-settings-panel .rr-press-face,
+.atlas-toolbar-extra .rr-press-face {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.atlas-canvas.is-entering,
+.atlas-processes.is-entering,
+.atlas-app.is-menu-open .atlas-rail,
+.atlas-app.is-tools-open .atlas-toolbar-extra,
+.atlas-app.is-search-open .atlas-search {
+  animation: rr-rise var(--rr-motion) var(--rr-ease);
+}
+.atlas-app.is-detail-open .atlas-sidebar {
+  animation: rr-rise var(--rr-motion) var(--rr-ease);
+}
+.atlas-app.is-detail-open .atlas-sidebar.is-shown {
+  animation: none;
+}
+.atlas-sidebar.is-dragging { animation: none; transition: none; }
+
+@keyframes rr-rise {
+  from { opacity: .01; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+.atlas-sheet-handle {
+  display: none;
+  width: 100%;
+  min-height: 44px;
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  touch-action: none;
+}
+.atlas-sheet-handle::before {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 4px;
+  margin: 8px auto 0;
+  border-radius: 4px;
+  background: var(--rr-orchid);
+}
+
+.atlas-tour {
+  position: fixed;
+  z-index: 40;
+  left: 12px;
+  right: 12px;
+  bottom: calc(var(--rr-tabbar) + var(--rr-keyboard, 0px) + 12px);
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--rr-orchid);
+  border-radius: 16px;
+  background: var(--rr-panel);
+  color: var(--rr-paper);
+  box-shadow: 0 16px 40px rgba(7, 0, 1, .35);
+}
+.atlas-tour h2 { margin: 0; font-size: 20px; }
+.atlas-tour p { margin: 0; font-size: 16px; line-height: 1.4; overflow-wrap: normal; word-break: normal; }
+.atlas-tour-actions { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; gap: 8px; }
+.atlas-tour-actions .rr-press { width: 100%; }
+.atlas-tour .rr-press .rr-press-face { min-height: 44px; width: 100%; }
+.atlas-tour .rr-press.atlas-button--primary .rr-press-face,
+.atlas-tour button.rr-press.atlas-button--primary:hover .rr-press-face {
+  background: var(--rr-fuchsia);
+  border-color: var(--rr-fuchsia);
+  color: var(--rr-paper-fixed);
+}
+
+.atlas-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.atlas-toast[hidden] { display: none; }
+.atlas-toast .rr-press { flex: 0 0 auto; }
+
+.atlas-card h3 { margin-top: 0; }
+.atlas-card .kind { text-transform: none; letter-spacing: 0; font-size: 14px; font-weight: 700; }
+
+@media (max-width: 760px) {
+  .atlas-sheet-handle { display: block; }
+  .atlas-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 56px;
+    padding: 8px 12px;
+    padding-top: calc(8px + env(safe-area-inset-top));
+  }
+  .atlas-brand { flex: 0 0 auto; min-width: 0; gap: 8px; }
+  .atlas-brand > div > span { display: none; }
+  .atlas-brand > .atlas-logo-frame {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    padding: 2px;
+    box-shadow: none;
+    flex: 0 0 auto;
+  }
+  .atlas-brand .atlas-logo-image { width: 28px; height: 28px; }
+  .atlas-brand strong { font-size: 14px; line-height: 1; white-space: nowrap; }
+  .atlas-tabbar .rr-press-face {
+    padding: 6px 2px;
+    font-size: 14px;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .atlas-header-tools {
+    flex: 1 1 auto;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+  }
+  .atlas-header-tools .atlas-search { flex: 1 1 auto; flex-basis: auto; min-width: 0; }
+  .atlas-settings-toggle { flex: 0 0 auto; }
+  .atlas-desktop-only { display: none !important; }
+  .atlas-status, .atlas-bpmn-status, .atlas-where { font-size: 16px; }
+}
+
+.atlas-rail .rr-press { padding: 0 0 var(--rr-press-depth); margin: 4px 0; background: transparent; border: 0; }
+@media (min-width: 761px) {
+  .atlas-tour { display: none !important; }
+  .atlas-settings-toggle.rr-press { width: auto; min-width: 44px; }
+  .atlas-settings-toggle.rr-press .rr-press-face { width: auto; min-width: 44px; padding-inline: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-canvas.is-entering,
+  .atlas-processes.is-entering,
+  .atlas-app.is-detail-open .atlas-sidebar,
+  .atlas-app.is-menu-open .atlas-rail,
+  .atlas-app.is-tools-open .atlas-toolbar-extra,
+  .rr-press-face { animation: none; transition: none; }
+}

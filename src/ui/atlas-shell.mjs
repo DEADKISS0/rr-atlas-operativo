@@ -14,10 +14,11 @@ export function createAtlasShell({ root }) {
     setCollapsed(!layout.classList.contains('is-collapsed'));
   });
 
-  const initialCollapsed = window.matchMedia?.('(max-width: 720px)').matches ?? false;
-  setCollapsed(initialCollapsed);
-  const mediaQuery = window.matchMedia?.('(max-width: 720px)');
-  mediaQuery?.addEventListener?.('change', (event) => setCollapsed(event.matches));
+  setCollapsed(false);
+  const desktopQuery = window.matchMedia?.('(min-width: 761px)');
+  desktopQuery?.addEventListener?.('change', (event) => {
+    if (!event.matches) setCollapsed(false);
+  });
 
   return Object.freeze({
     collapse: setCollapsed,

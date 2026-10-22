@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="def_flujo_ia" targetNamespace="https://rraliados.co/bpmn" exporter="RR Aliados · bpmn_xml_v2.py" exporterVersion="2.0">
+  <bpmn:collaboration id="collab_1">
+    <bpmn:participant id="part_1" name="CÓMO SE CONVIERTE UN TRABAJO REPETITIVO EN UN AGENTE" processRef="proc_flujo_ia"/>
+  </bpmn:collaboration>
+  <bpmn:process id="proc_flujo_ia" name="CÓMO SE CONVIERTE UN TRABAJO REPETITIVO EN UN AGENTE" isExecutable="false">
+    <bpmn:documentation>CÓMO SE CONVIERTE UN TRABAJO REPETITIVO EN UN AGENTE
+Ocho pasos. El orden importa: se automatiza al final, no al principio. · corte 2026-09-26
+Dueno del proceso: DESCONOCIDO (el spec no lo declara)
+KPI: DESCONOCIDO (el spec no lo declara)
+Fuente: _herramientas/esquemas_bpmn/ia_como_se_convierte_un_trabajo_repetitivo_en_un_agente.json</bpmn:documentation>
+    <bpmn:laneSet id="laneset_1">
+      <bpmn:lane id="lane_1" name="1 · Antes de automatizar">
+        <bpmn:flowNodeRef>e_ini</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_tarea</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_agente</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_skill</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_prueba</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_fuente</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_2" name="2 · La revisión humana">
+        <bpmn:flowNodeRef>g_revision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_revisar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_auto</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>e_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="e_ini" name="Necesidad repetitiva">
+      <bpmn:outgoing>sf_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="t_tarea" name="2. Definir la tarea">
+      <bpmn:documentation>Qué entra, qué sale, y cuándo se sabe que terminó.</bpmn:documentation>
+      <bpmn:incoming>sf_1</bpmn:incoming>
+      <bpmn:outgoing>sf_2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_agente" name="3. Elegir agente">
+      <bpmn:documentation>Cuál de los diez encaja. Si ninguno encaja, se escribe uno.</bpmn:documentation>
+      <bpmn:incoming>sf_2</bpmn:incoming>
+      <bpmn:outgoing>sf_3</bpmn:outgoing>
+      <bpmn:property id="prop_t_agente" name="__targetRef_placeholder"/>
+      <bpmn:dataInputAssociation id="dia_1">
+        <bpmn:documentation>quién hay</bpmn:documentation>
+        <bpmn:sourceRef>d_flota</bpmn:sourceRef>
+        <bpmn:targetRef>prop_t_agente</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:task id="t_skill" name="4. Documentar el skill">
+      <bpmn:documentation>Se escribe CÓMO se hace, paso a paso, no qué se hace. Sin esto el agente improvisa.</bpmn:documentation>
+      <bpmn:incoming>sf_3</bpmn:incoming>
+      <bpmn:outgoing>sf_4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_prueba" name="5. Probar caso pequeño">
+      <bpmn:documentation>Un caso real, a mano, antes de dejarlo solo.</bpmn:documentation>
+      <bpmn:incoming>sf_4</bpmn:incoming>
+      <bpmn:outgoing>sf_5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_fuente" name="6. Conectar a la fuente">
+      <bpmn:documentation>De dónde lee los datos. Solo el perfil principal tiene acceso a Drive.</bpmn:documentation>
+      <bpmn:incoming>sf_5</bpmn:incoming>
+      <bpmn:incoming>sf_9</bpmn:incoming>
+      <bpmn:outgoing>sf_6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g_revision" name="7. ¿Revisó una persona?">
+      <bpmn:incoming>sf_6</bpmn:incoming>
+      <bpmn:outgoing>sf_7</bpmn:outgoing>
+      <bpmn:outgoing>sf_8</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="t_revisar" name="Se salta la revisión">
+      <bpmn:documentation>Ningún agente publica solo. Si se salta este paso, el error se repite solo.</bpmn:documentation>
+      <bpmn:incoming>sf_7</bpmn:incoming>
+      <bpmn:outgoing>sf_9</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_auto" name="8. Automatizar si es estable">
+      <bpmn:documentation>Solo si los pasos 1 a 7 ya funcionan a mano. Antes de eso es un trabajo que alguien tiene que hacer igual.</bpmn:documentation>
+      <bpmn:incoming>sf_8</bpmn:incoming>
+      <bpmn:outgoing>sf_10</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="e_fin" name="Agente que corre">
+      <bpmn:incoming>sf_10</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:dataObject id="do_d_flota"/>
+    <bpmn:dataObjectReference id="d_flota" dataObjectRef="do_d_flota" name="flota_ia.md">
+      <bpmn:documentation>10 agentes (9 operativos + pigui, que no trabaja). 10 trabajos activos: 6 en perfiles de bot y 4 en el store. 3 ya corrieron.</bpmn:documentation>
+    </bpmn:dataObjectReference>
+    <bpmn:sequenceFlow id="sf_1" sourceRef="e_ini" targetRef="t_tarea"/>
+    <bpmn:sequenceFlow id="sf_2" sourceRef="t_tarea" targetRef="t_agente"/>
+    <bpmn:sequenceFlow id="sf_3" sourceRef="t_agente" targetRef="t_skill"/>
+    <bpmn:sequenceFlow id="sf_4" sourceRef="t_skill" targetRef="t_prueba"/>
+    <bpmn:sequenceFlow id="sf_5" sourceRef="t_prueba" targetRef="t_fuente"/>
+    <bpmn:sequenceFlow id="sf_6" sourceRef="t_fuente" targetRef="g_revision"/>
+    <bpmn:sequenceFlow id="sf_7" sourceRef="g_revision" targetRef="t_revisar" name="no"/>
+    <bpmn:sequenceFlow id="sf_8" sourceRef="g_revision" targetRef="t_auto" name="sí"/>
+    <bpmn:sequenceFlow id="sf_9" sourceRef="t_revisar" targetRef="t_fuente"/>
+    <bpmn:sequenceFlow id="sf_10" sourceRef="t_auto" targetRef="e_fin"/>
+    <bpmn:textAnnotation id="nota_1">
+      <bpmn:text>El paso 7 está marcado en rojo por una razón: ningún agente publica solo. Si se salta, el agente amplifica el error en vez de ahorrar trabajo.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_1" sourceRef="nota_1" targetRef="g_revision"/>
+    <bpmn:textAnnotation id="nota_2">
+      <bpmn:text>Corrección 2026-09-26: este texto decía antes «acceso a Drive y Notion». Notion NO se usa desde esa fecha: ni se lee, ni se escribe, ni se cita. Solo el perfil principal ve Drive; los demás agentes reciben los datos ya leídos.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_2" sourceRef="nota_2" targetRef="t_fuente"/>
+    <bpmn:textAnnotation id="nota_3">
+      <bpmn:text>LO QUE NO ENCAJA: la flota se recortó de 21 a 9, quedó sin modelo de respaldo, y 7 de los 9 trabajos programados nunca corrieron. La carga de trabajo no está sincronizada.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_3" sourceRef="nota_3" targetRef="d_flota"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="diagrama_1">
+    <bpmndi:BPMNPlane id="plano_1" bpmnElement="collab_1">
+      <bpmndi:BPMNShape id="part_1_di" bpmnElement="part_1" isHorizontal="true">
+        <dc:Bounds x="100" y="80" width="2010" height="660"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_1_di" bpmnElement="lane_1" isHorizontal="true">
+        <dc:Bounds x="130" y="80" width="1980" height="330"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_2_di" bpmnElement="lane_2" isHorizontal="true">
+        <dc:Bounds x="130" y="410" width="1980" height="330"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_ini_di" bpmnElement="e_ini">
+        <dc:Bounds x="257" y="127" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="205" y="167" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_tarea_di" bpmnElement="t_tarea">
+        <dc:Bounds x="410" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_agente_di" bpmnElement="t_agente">
+        <dc:Bounds x="620" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_skill_di" bpmnElement="t_skill">
+        <dc:Bounds x="830" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_prueba_di" bpmnElement="t_prueba">
+        <dc:Bounds x="1040" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_fuente_di" bpmnElement="t_fuente">
+        <dc:Bounds x="1250" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_revision_di" bpmnElement="g_revision" isMarkerVisible="true">
+        <dc:Bounds x="1510" y="450" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1465" y="504" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_revisar_di" bpmnElement="t_revisar" bioc:stroke="#e05252">
+        <dc:Bounds x="1670" y="435" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_auto_di" bpmnElement="t_auto" bioc:stroke="#4d9e5c">
+        <dc:Bounds x="1670" y="565" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_fin_di" bpmnElement="e_fin">
+        <dc:Bounds x="1937" y="457" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1885" y="497" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="d_flota_di" bpmnElement="d_flota">
+        <dc:Bounds x="677" y="250" width="36" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="625" y="304" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="sf_1_di" bpmnElement="sf_1">
+        <di:waypoint x="293" y="145"/>
+        <di:waypoint x="410" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_2_di" bpmnElement="sf_2">
+        <di:waypoint x="560" y="145"/>
+        <di:waypoint x="620" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_3_di" bpmnElement="sf_3">
+        <di:waypoint x="770" y="145"/>
+        <di:waypoint x="830" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_4_di" bpmnElement="sf_4">
+        <di:waypoint x="980" y="145"/>
+        <di:waypoint x="1040" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_5_di" bpmnElement="sf_5">
+        <di:waypoint x="1190" y="145"/>
+        <di:waypoint x="1250" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_6_di" bpmnElement="sf_6">
+        <di:waypoint x="1400" y="145"/>
+        <di:waypoint x="1490" y="145"/>
+        <di:waypoint x="1490" y="475"/>
+        <di:waypoint x="1510" y="475"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_7_di" bpmnElement="sf_7">
+        <di:waypoint x="1560" y="475"/>
+        <di:waypoint x="1670" y="475"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_8_di" bpmnElement="sf_8">
+        <di:waypoint x="1560" y="475"/>
+        <di:waypoint x="1650" y="475"/>
+        <di:waypoint x="1650" y="605"/>
+        <di:waypoint x="1670" y="605"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_9_di" bpmnElement="sf_9">
+        <di:waypoint x="1745" y="515"/>
+        <di:waypoint x="1745" y="728"/>
+        <di:waypoint x="1325" y="728"/>
+        <di:waypoint x="1325" y="185"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_10_di" bpmnElement="sf_10">
+        <di:waypoint x="1820" y="605"/>
+        <di:waypoint x="1917" y="605"/>
+        <di:waypoint x="1917" y="475"/>
+        <di:waypoint x="1937" y="475"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="dia_1_di" bpmnElement="dia_1">
+        <di:waypoint x="695" y="250"/>
+        <di:waypoint x="695" y="185"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="nota_1_di" bpmnElement="nota_1">
+        <dc:Bounds x="1510" y="780" width="230" height="74"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_2_di" bpmnElement="nota_2">
+        <dc:Bounds x="1250" y="780" width="230" height="119"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_3_di" bpmnElement="nota_3">
+        <dc:Bounds x="677" y="780" width="230" height="89"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="as_nota_1_di" bpmnElement="as_nota_1">
+        <di:waypoint x="1625" y="780"/>
+        <di:waypoint x="1535" y="500"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_2_di" bpmnElement="as_nota_2">
+        <di:waypoint x="1365" y="780"/>
+        <di:waypoint x="1325" y="185"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_3_di" bpmnElement="as_nota_3">
+        <di:waypoint x="792" y="780"/>
+        <di:waypoint x="695" y="300"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

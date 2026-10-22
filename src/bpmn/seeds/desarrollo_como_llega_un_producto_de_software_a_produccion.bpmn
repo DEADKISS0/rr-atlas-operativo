@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="def_flujo_desarrollo" targetNamespace="https://rraliados.co/bpmn" exporter="RR Aliados · bpmn_xml_v2.py" exporterVersion="2.0">
+  <bpmn:collaboration id="collab_1">
+    <bpmn:participant id="part_1" name="CÓMO LLEGA UN PRODUCTO DE SOFTWARE A PRODUCCIÓN" processRef="proc_flujo_desarrollo"/>
+  </bpmn:collaboration>
+  <bpmn:process id="proc_flujo_desarrollo" name="CÓMO LLEGA UN PRODUCTO DE SOFTWARE A PRODUCCIÓN" isExecutable="false">
+    <bpmn:documentation>CÓMO LLEGA UN PRODUCTO DE SOFTWARE A PRODUCCIÓN
+Diez pasos, del brief al mantenimiento. El que más se salta es el 6: la revisión del cliente, que vuelve atrás todo el trabajo. · corte 2026-09-26
+Dueno del proceso: DESCONOCIDO (el spec no lo declara)
+KPI: DESCONOCIDO (el spec no lo declara)
+Fuente: _herramientas/esquemas_bpmn/desarrollo_como_llega_un_producto_de_software_a_produccion.json</bpmn:documentation>
+    <bpmn:laneSet id="laneset_1">
+      <bpmn:lane id="lane_1" name="1 · Desarrollo">
+        <bpmn:flowNodeRef>e_ini</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_brief</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_arq</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_proto</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_impl</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_qa</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_2" name="2 · El cliente">
+        <bpmn:flowNodeRef>g_ok</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_ajustes</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_reprueba</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_3" name="3 · Después de producción">
+        <bpmn:flowNodeRef>t_deploy</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_docs</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_manten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>e_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="e_ini" name="Idea o encargo">
+      <bpmn:outgoing>sf_1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="ed_e_ini"/>
+    </bpmn:startEvent>
+    <bpmn:task id="t_brief" name="1. Brief técnico">
+      <bpmn:documentation>Qué hay que construir, para quién y con qué límites.</bpmn:documentation>
+      <bpmn:incoming>sf_1</bpmn:incoming>
+      <bpmn:outgoing>sf_2</bpmn:outgoing>
+      <bpmn:property id="prop_t_brief" name="__targetRef_placeholder"/>
+      <bpmn:dataInputAssociation id="dia_1">
+        <bpmn:documentation>qué hay</bpmn:documentation>
+        <bpmn:sourceRef>d_apps</bpmn:sourceRef>
+        <bpmn:targetRef>prop_t_brief</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:task id="t_arq" name="2. Arquitectura">
+      <bpmn:documentation>Se decide cómo va armado: lenguaje, datos, despliegue.</bpmn:documentation>
+      <bpmn:incoming>sf_2</bpmn:incoming>
+      <bpmn:outgoing>sf_3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_proto" name="3. Prototipo">
+      <bpmn:documentation>La primera versión que se puede tocar.</bpmn:documentation>
+      <bpmn:incoming>sf_3</bpmn:incoming>
+      <bpmn:outgoing>sf_4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_impl" name="4. Implementación">
+      <bpmn:documentation>Se escribe el código real.</bpmn:documentation>
+      <bpmn:incoming>sf_4</bpmn:incoming>
+      <bpmn:incoming>sf_10</bpmn:incoming>
+      <bpmn:outgoing>sf_5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_qa" name="5. QA interno">
+      <bpmn:documentation>Se prueba antes de que lo vea el cliente.</bpmn:documentation>
+      <bpmn:incoming>sf_5</bpmn:incoming>
+      <bpmn:outgoing>sf_6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g_ok" name="6. ¿Lo aprueba el cliente?">
+      <bpmn:incoming>sf_6</bpmn:incoming>
+      <bpmn:outgoing>sf_7</bpmn:outgoing>
+      <bpmn:outgoing>sf_8</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="t_ajustes" name="7. Ajustes">
+      <bpmn:documentation>Se corrige lo que pidió.</bpmn:documentation>
+      <bpmn:incoming>sf_7</bpmn:incoming>
+      <bpmn:outgoing>sf_9</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g_reprueba" name="¿Pasa el QA?">
+      <bpmn:incoming>sf_9</bpmn:incoming>
+      <bpmn:outgoing>sf_10</bpmn:outgoing>
+      <bpmn:outgoing>sf_11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="t_deploy" name="8. Deploy">
+      <bpmn:documentation>Sale a producción: Railway, Vercel o el servidor propio.</bpmn:documentation>
+      <bpmn:incoming>sf_8</bpmn:incoming>
+      <bpmn:incoming>sf_11</bpmn:incoming>
+      <bpmn:outgoing>sf_12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_docs" name="9. Documentación técnica">
+      <bpmn:documentation>Alguien que no lo escribió tiene que poder usarlo. Si esto falta, el producto se vuelve inmanejable.</bpmn:documentation>
+      <bpmn:incoming>sf_12</bpmn:incoming>
+      <bpmn:outgoing>sf_13</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_manten" name="10. Mantenimiento">
+      <bpmn:documentation>Cambios, correcciones y soporte.</bpmn:documentation>
+      <bpmn:incoming>sf_13</bpmn:incoming>
+      <bpmn:outgoing>sf_14</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="e_fin" name="En manos del cliente">
+      <bpmn:incoming>sf_14</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:dataObject id="do_d_apps"/>
+    <bpmn:dataObjectReference id="d_apps" dataObjectRef="do_d_apps" name="Los 4 productos">
+      <bpmn:documentation>RR Commander (Railway, en producción) · DashWeb (Vercel) · Primer Contacto (local, sin deploy) · Match Numa (en desarrollo).</bpmn:documentation>
+    </bpmn:dataObjectReference>
+    <bpmn:sequenceFlow id="sf_1" sourceRef="e_ini" targetRef="t_brief"/>
+    <bpmn:sequenceFlow id="sf_2" sourceRef="t_brief" targetRef="t_arq" name="se diseña"/>
+    <bpmn:sequenceFlow id="sf_3" sourceRef="t_arq" targetRef="t_proto"/>
+    <bpmn:sequenceFlow id="sf_4" sourceRef="t_proto" targetRef="t_impl"/>
+    <bpmn:sequenceFlow id="sf_5" sourceRef="t_impl" targetRef="t_qa"/>
+    <bpmn:sequenceFlow id="sf_6" sourceRef="t_qa" targetRef="g_ok"/>
+    <bpmn:sequenceFlow id="sf_7" sourceRef="g_ok" targetRef="t_ajustes" name="no: pide cambios"/>
+    <bpmn:sequenceFlow id="sf_8" sourceRef="g_ok" targetRef="t_deploy" name="sí"/>
+    <bpmn:sequenceFlow id="sf_9" sourceRef="t_ajustes" targetRef="g_reprueba"/>
+    <bpmn:sequenceFlow id="sf_10" sourceRef="g_reprueba" targetRef="t_impl" name="no: vuelve al 4"/>
+    <bpmn:sequenceFlow id="sf_11" sourceRef="g_reprueba" targetRef="t_deploy" name="sí"/>
+    <bpmn:sequenceFlow id="sf_12" sourceRef="t_deploy" targetRef="t_docs"/>
+    <bpmn:sequenceFlow id="sf_13" sourceRef="t_docs" targetRef="t_manten"/>
+    <bpmn:sequenceFlow id="sf_14" sourceRef="t_manten" targetRef="e_fin"/>
+    <bpmn:textAnnotation id="nota_1">
+      <bpmn:text>ACÁ SE ATRAPA EL TRABAJO: todo vuelve al paso 4, la implementación. No hay límite de rondas escrito, así que una revisión puede devolver el desarrollo completo.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_1" sourceRef="nota_1" targetRef="g_ok"/>
+    <bpmn:textAnnotation id="nota_2">
+      <bpmn:text>Una regla que no se rompe: el código de producción va en su carpeta en Drive y nunca en un solo computador.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_2" sourceRef="nota_2" targetRef="t_deploy"/>
+    <bpmn:textAnnotation id="nota_3">
+      <bpmn:text>Decidido el 26/09: CLIENTE_B entra el 12/10 a DashWeb, que deja de ser solo dashboard y pasa a ser la plataforma de pedidos multi-sede. El código de multi-sede NO existe todavía. TODO: decidir si los números financieros se ven en la misma pantalla o se separan.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_3" sourceRef="nota_3" targetRef="d_apps"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="diagrama_1">
+    <bpmndi:BPMNPlane id="plano_1" bpmnElement="collab_1">
+      <bpmndi:BPMNShape id="part_1_di" bpmnElement="part_1" isHorizontal="true">
+        <dc:Bounds x="100" y="80" width="2850" height="600"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_1_di" bpmnElement="lane_1" isHorizontal="true">
+        <dc:Bounds x="130" y="80" width="2820" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_2_di" bpmnElement="lane_2" isHorizontal="true">
+        <dc:Bounds x="130" y="280" width="2820" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_3_di" bpmnElement="lane_3" isHorizontal="true">
+        <dc:Bounds x="130" y="480" width="2820" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_ini_di" bpmnElement="e_ini">
+        <dc:Bounds x="257" y="127" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="205" y="167" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_brief_di" bpmnElement="t_brief">
+        <dc:Bounds x="410" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_arq_di" bpmnElement="t_arq">
+        <dc:Bounds x="620" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_proto_di" bpmnElement="t_proto">
+        <dc:Bounds x="830" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_impl_di" bpmnElement="t_impl">
+        <dc:Bounds x="1040" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_qa_di" bpmnElement="t_qa">
+        <dc:Bounds x="1250" y="105" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_ok_di" bpmnElement="g_ok" isMarkerVisible="true">
+        <dc:Bounds x="1510" y="320" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1465" y="374" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_ajustes_di" bpmnElement="t_ajustes">
+        <dc:Bounds x="1670" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_reprueba_di" bpmnElement="g_reprueba" isMarkerVisible="true">
+        <dc:Bounds x="1930" y="320" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1885" y="374" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_deploy_di" bpmnElement="t_deploy" bioc:stroke="#4d9e5c">
+        <dc:Bounds x="2090" y="505" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_docs_di" bpmnElement="t_docs">
+        <dc:Bounds x="2300" y="505" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_manten_di" bpmnElement="t_manten">
+        <dc:Bounds x="2510" y="505" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_fin_di" bpmnElement="e_fin">
+        <dc:Bounds x="2777" y="527" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2725" y="567" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="d_apps_di" bpmnElement="d_apps">
+        <dc:Bounds x="467" y="520" width="36" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="415" y="574" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="sf_1_di" bpmnElement="sf_1">
+        <di:waypoint x="293" y="145"/>
+        <di:waypoint x="410" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_2_di" bpmnElement="sf_2">
+        <di:waypoint x="560" y="145"/>
+        <di:waypoint x="620" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_3_di" bpmnElement="sf_3">
+        <di:waypoint x="770" y="145"/>
+        <di:waypoint x="830" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_4_di" bpmnElement="sf_4">
+        <di:waypoint x="980" y="145"/>
+        <di:waypoint x="1040" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_5_di" bpmnElement="sf_5">
+        <di:waypoint x="1190" y="145"/>
+        <di:waypoint x="1250" y="145"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_6_di" bpmnElement="sf_6">
+        <di:waypoint x="1400" y="145"/>
+        <di:waypoint x="1490" y="145"/>
+        <di:waypoint x="1490" y="345"/>
+        <di:waypoint x="1510" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_7_di" bpmnElement="sf_7">
+        <di:waypoint x="1560" y="345"/>
+        <di:waypoint x="1670" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_8_di" bpmnElement="sf_8">
+        <di:waypoint x="1560" y="345"/>
+        <di:waypoint x="2070" y="345"/>
+        <di:waypoint x="2070" y="545"/>
+        <di:waypoint x="2090" y="545"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_9_di" bpmnElement="sf_9">
+        <di:waypoint x="1820" y="345"/>
+        <di:waypoint x="1930" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_10_di" bpmnElement="sf_10">
+        <di:waypoint x="1955" y="370"/>
+        <di:waypoint x="1955" y="468"/>
+        <di:waypoint x="1115" y="468"/>
+        <di:waypoint x="1115" y="185"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_11_di" bpmnElement="sf_11">
+        <di:waypoint x="1980" y="345"/>
+        <di:waypoint x="2070" y="345"/>
+        <di:waypoint x="2070" y="545"/>
+        <di:waypoint x="2090" y="545"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_12_di" bpmnElement="sf_12">
+        <di:waypoint x="2240" y="545"/>
+        <di:waypoint x="2300" y="545"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_13_di" bpmnElement="sf_13">
+        <di:waypoint x="2450" y="545"/>
+        <di:waypoint x="2510" y="545"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_14_di" bpmnElement="sf_14">
+        <di:waypoint x="2660" y="545"/>
+        <di:waypoint x="2777" y="545"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="dia_1_di" bpmnElement="dia_1">
+        <di:waypoint x="485" y="520"/>
+        <di:waypoint x="485" y="185"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="nota_1_di" bpmnElement="nota_1">
+        <dc:Bounds x="1510" y="720" width="230" height="89"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_2_di" bpmnElement="nota_2">
+        <dc:Bounds x="2090" y="720" width="230" height="59"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_3_di" bpmnElement="nota_3">
+        <dc:Bounds x="467" y="720" width="230" height="134"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="as_nota_1_di" bpmnElement="as_nota_1">
+        <di:waypoint x="1625" y="720"/>
+        <di:waypoint x="1535" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_2_di" bpmnElement="as_nota_2">
+        <di:waypoint x="2205" y="720"/>
+        <di:waypoint x="2165" y="585"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_3_di" bpmnElement="as_nota_3">
+        <di:waypoint x="582" y="720"/>
+        <di:waypoint x="485" y="570"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

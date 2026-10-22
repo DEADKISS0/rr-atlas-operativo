@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="def_flujo_informacion" targetNamespace="https://rraliados.co/bpmn" exporter="RR Aliados · bpmn_xml_v2.py" exporterVersion="2.0">
+  <bpmn:collaboration id="collab_1">
+    <bpmn:participant id="part_1" name="DE DÓNDE SALE LA RESPUESTA" processRef="proc_flujo_informacion"/>
+  </bpmn:collaboration>
+  <bpmn:process id="proc_flujo_informacion" name="DE DÓNDE SALE LA RESPUESTA" isExecutable="false">
+    <bpmn:documentation>DE DÓNDE SALE LA RESPUESTA
+El camino que recorre una pregunta desde que se hace hasta que tiene una respuesta con fuente. · corte 2026-09-26
+Dueno del proceso: DESCONOCIDO (el spec no lo declara)
+KPI: DESCONOCIDO (el spec no lo declara)
+Fuente: _herramientas/esquemas_bpmn/informacion_de_donde_sale_la_respuesta.json</bpmn:documentation>
+    <bpmn:laneSet id="laneset_1">
+      <bpmn:lane id="lane_1" name="1 · La pregunta">
+        <bpmn:flowNodeRef>e_ini</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_2" name="2 · La skill decide">
+        <bpmn:flowNodeRef>t_ruta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_encuentra</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_busca</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_fuente</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_3" name="3 · La respuesta">
+        <bpmn:flowNodeRef>t_responde</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_limite</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_notion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_notion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_persona</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>e_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t_hueco</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g_alcanza</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="e_ini" name="Alguien pregunta">
+      <bpmn:outgoing>sf_1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="ed_e_ini"/>
+    </bpmn:startEvent>
+    <bpmn:task id="t_ruta" name="1. rr-consulta decide dónde mirar">
+      <bpmn:documentation>La skill lee 00_RUTAS.md y elige la nota correcta. No explora a ciegas.</bpmn:documentation>
+      <bpmn:incoming>sf_1</bpmn:incoming>
+      <bpmn:outgoing>sf_2</bpmn:outgoing>
+      <bpmn:property id="prop_t_ruta" name="__targetRef_placeholder"/>
+      <bpmn:dataInputAssociation id="dia_1">
+        <bpmn:documentation>el índice</bpmn:documentation>
+        <bpmn:sourceRef>d_rutas</bpmn:sourceRef>
+        <bpmn:targetRef>prop_t_ruta</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g_encuentra" name="2. ¿Encontró la nota?">
+      <bpmn:incoming>sf_2</bpmn:incoming>
+      <bpmn:outgoing>sf_3</bpmn:outgoing>
+      <bpmn:outgoing>sf_4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="t_busca" name="Si la fuente no está">
+      <bpmn:documentation>Se dice DESCONOCIDO y el dato se busca en la fuente real. Acá se inventan cosas.</bpmn:documentation>
+      <bpmn:incoming>sf_3</bpmn:incoming>
+      <bpmn:incoming>sf_11</bpmn:incoming>
+      <bpmn:outgoing>sf_5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_fuente" name="3. La nota fuente">
+      <bpmn:documentation>Tiene que decir de dónde salió: fuentes: en el frontmatter, fecha de corte, y el archivo canónico en Drive.</bpmn:documentation>
+      <bpmn:incoming>sf_4</bpmn:incoming>
+      <bpmn:incoming>sf_5</bpmn:incoming>
+      <bpmn:outgoing>sf_6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_responde" name="4. Se responde con fuente">
+      <bpmn:documentation>La respuesta trae el dato, de dónde sale y a qué fecha corresponde.</bpmn:documentation>
+      <bpmn:incoming>sf_6</bpmn:incoming>
+      <bpmn:outgoing>sf_7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_limite" name="5. Se declara el límite">
+      <bpmn:documentation>Si parte de la respuesta no se sabe, se dice. No se completa con un supuesto callado.</bpmn:documentation>
+      <bpmn:incoming>sf_7</bpmn:incoming>
+      <bpmn:outgoing>sf_8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g_notion" name="6. ¿Trae algo de Notion?">
+      <bpmn:incoming>sf_8</bpmn:incoming>
+      <bpmn:outgoing>sf_9</bpmn:outgoing>
+      <bpmn:outgoing>sf_10</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="t_notion" name="Notion no se usa">
+      <bpmn:documentation>Ni se lee, ni se escribe, ni se cita. Decisión del 26/09. Si una respuesta trae datos de Notion, está mal aunque suene bien.</bpmn:documentation>
+      <bpmn:incoming>sf_9</bpmn:incoming>
+      <bpmn:outgoing>sf_11</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="t_persona" name="7. La persona lee">
+      <bpmn:documentation>Respuesta corta, con el número y de dónde sale. Si no hay dato, eso es lo que se responde.</bpmn:documentation>
+      <bpmn:incoming>sf_10</bpmn:incoming>
+      <bpmn:outgoing>sf_12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="e_fin" name="Respondido con fuente">
+      <bpmn:incoming>sf_13</bpmn:incoming>
+      <bpmn:incoming>sf_15</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="t_hueco" name="Se anota el hueco">
+      <bpmn:documentation>La pregunta no estaba documentada. Se anota en 00_HUECOS.md con la pregunta y a quién preguntarle.</bpmn:documentation>
+      <bpmn:incoming>sf_14</bpmn:incoming>
+      <bpmn:outgoing>sf_15</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g_alcanza" name="¿Alcanzó la respuesta?">
+      <bpmn:incoming>sf_12</bpmn:incoming>
+      <bpmn:outgoing>sf_13</bpmn:outgoing>
+      <bpmn:outgoing>sf_14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:dataObject id="do_d_rutas"/>
+    <bpmn:dataObjectReference id="d_rutas" dataObjectRef="do_d_rutas" name="00_RUTAS.md">
+      <bpmn:documentation>La puerta de entrada. Todo entra por esta nota: si algo no está ahí, no existe para quien pregunta.</bpmn:documentation>
+    </bpmn:dataObjectReference>
+    <bpmn:sequenceFlow id="sf_1" sourceRef="e_ini" targetRef="t_ruta" name="las dos rutas usan la misma skill"/>
+    <bpmn:sequenceFlow id="sf_2" sourceRef="t_ruta" targetRef="g_encuentra"/>
+    <bpmn:sequenceFlow id="sf_3" sourceRef="g_encuentra" targetRef="t_busca" name="no"/>
+    <bpmn:sequenceFlow id="sf_4" sourceRef="g_encuentra" targetRef="t_fuente" name="sí"/>
+    <bpmn:sequenceFlow id="sf_5" sourceRef="t_busca" targetRef="t_fuente"/>
+    <bpmn:sequenceFlow id="sf_6" sourceRef="t_fuente" targetRef="t_responde"/>
+    <bpmn:sequenceFlow id="sf_7" sourceRef="t_responde" targetRef="t_limite"/>
+    <bpmn:sequenceFlow id="sf_8" sourceRef="t_limite" targetRef="g_notion"/>
+    <bpmn:sequenceFlow id="sf_9" sourceRef="g_notion" targetRef="t_notion" name="sí: está mal"/>
+    <bpmn:sequenceFlow id="sf_10" sourceRef="g_notion" targetRef="t_persona" name="no"/>
+    <bpmn:sequenceFlow id="sf_11" sourceRef="t_notion" targetRef="t_busca" name="se rehace"/>
+    <bpmn:sequenceFlow id="sf_12" sourceRef="t_persona" targetRef="g_alcanza"/>
+    <bpmn:sequenceFlow id="sf_13" sourceRef="g_alcanza" targetRef="e_fin" name="sí"/>
+    <bpmn:sequenceFlow id="sf_14" sourceRef="g_alcanza" targetRef="t_hueco" name="no: no estaba documentado"/>
+    <bpmn:sequenceFlow id="sf_15" sourceRef="t_hueco" targetRef="e_fin"/>
+    <bpmn:textAnnotation id="nota_1">
+      <bpmn:text>Si la skill empieza a recorrer el vault, la ruta falló. Leer 00_RUTAS es lo que hace que la respuesta salga en segundos y no en un minuto.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_1" sourceRef="nota_1" targetRef="t_ruta"/>
+    <bpmn:textAnnotation id="nota_2">
+      <bpmn:text>Si la nota no dice de dónde vino, eso no es una respuesta. Se dice DESCONOCIDO. Regla 1: una fuente por tema. Regla 2: el vault no es la fuente, el dato vive en Drive. Regla 3: sin fecha no hay respuesta. Regla 4: lo que no se sabe se escribe.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_2" sourceRef="nota_2" targetRef="t_busca"/>
+    <bpmn:textAnnotation id="nota_3">
+      <bpmn:text>La rueda vuelve: el hueco se resuelve, se documenta, y la próxima vez la respuesta ya existe. Un hueco anotado es un trabajo a medio hacer.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_3" sourceRef="nota_3" targetRef="t_hueco"/>
+    <bpmn:textAnnotation id="nota_4">
+      <bpmn:text>Nueve validadores, cada uno con un trabajo y probado con un error plantado. Ver COMO_VERIFICAR.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="as_nota_4" sourceRef="nota_4" targetRef="d_rutas"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="diagrama_1">
+    <bpmndi:BPMNPlane id="plano_1" bpmnElement="collab_1">
+      <bpmndi:BPMNShape id="part_1_di" bpmnElement="part_1" isHorizontal="true">
+        <dc:Bounds x="100" y="80" width="2640" height="860"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_1_di" bpmnElement="lane_1" isHorizontal="true">
+        <dc:Bounds x="130" y="80" width="2610" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_2_di" bpmnElement="lane_2" isHorizontal="true">
+        <dc:Bounds x="130" y="280" width="2610" height="330"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_3_di" bpmnElement="lane_3" isHorizontal="true">
+        <dc:Bounds x="130" y="610" width="2610" height="330"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_ini_di" bpmnElement="e_ini">
+        <dc:Bounds x="257" y="127" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="205" y="167" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_ruta_di" bpmnElement="t_ruta">
+        <dc:Bounds x="410" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_encuentra_di" bpmnElement="g_encuentra" isMarkerVisible="true">
+        <dc:Bounds x="670" y="320" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="625" y="374" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_busca_di" bpmnElement="t_busca" bioc:stroke="#e05252">
+        <dc:Bounds x="830" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_fuente_di" bpmnElement="t_fuente">
+        <dc:Bounds x="1040" y="305" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_responde_di" bpmnElement="t_responde" bioc:stroke="#4d9e5c">
+        <dc:Bounds x="1250" y="635" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_limite_di" bpmnElement="t_limite">
+        <dc:Bounds x="1460" y="635" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_notion_di" bpmnElement="g_notion" isMarkerVisible="true">
+        <dc:Bounds x="1720" y="650" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1675" y="704" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_notion_di" bpmnElement="t_notion" bioc:stroke="#e05252">
+        <dc:Bounds x="1880" y="635" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_persona_di" bpmnElement="t_persona">
+        <dc:Bounds x="1880" y="765" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="e_fin_di" bpmnElement="e_fin">
+        <dc:Bounds x="2567" y="657" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2515" y="697" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t_hueco_di" bpmnElement="t_hueco" bioc:stroke="#e08b45">
+        <dc:Bounds x="2300" y="635" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g_alcanza_di" bpmnElement="g_alcanza" isMarkerVisible="true">
+        <dc:Bounds x="2140" y="650" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2095" y="704" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="d_rutas_di" bpmnElement="d_rutas">
+        <dc:Bounds x="467" y="450" width="36" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="415" y="504" width="140" height="36"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="sf_1_di" bpmnElement="sf_1">
+        <di:waypoint x="293" y="145"/>
+        <di:waypoint x="390" y="145"/>
+        <di:waypoint x="390" y="345"/>
+        <di:waypoint x="410" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_2_di" bpmnElement="sf_2">
+        <di:waypoint x="560" y="345"/>
+        <di:waypoint x="670" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_3_di" bpmnElement="sf_3">
+        <di:waypoint x="720" y="345"/>
+        <di:waypoint x="830" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_4_di" bpmnElement="sf_4">
+        <di:waypoint x="720" y="345"/>
+        <di:waypoint x="1040" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_5_di" bpmnElement="sf_5">
+        <di:waypoint x="980" y="345"/>
+        <di:waypoint x="1040" y="345"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_6_di" bpmnElement="sf_6">
+        <di:waypoint x="1190" y="345"/>
+        <di:waypoint x="1230" y="345"/>
+        <di:waypoint x="1230" y="675"/>
+        <di:waypoint x="1250" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_7_di" bpmnElement="sf_7">
+        <di:waypoint x="1400" y="675"/>
+        <di:waypoint x="1460" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_8_di" bpmnElement="sf_8">
+        <di:waypoint x="1610" y="675"/>
+        <di:waypoint x="1720" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_9_di" bpmnElement="sf_9">
+        <di:waypoint x="1770" y="675"/>
+        <di:waypoint x="1880" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_10_di" bpmnElement="sf_10">
+        <di:waypoint x="1770" y="675"/>
+        <di:waypoint x="1860" y="675"/>
+        <di:waypoint x="1860" y="805"/>
+        <di:waypoint x="1880" y="805"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_11_di" bpmnElement="sf_11">
+        <di:waypoint x="1955" y="715"/>
+        <di:waypoint x="1955" y="928"/>
+        <di:waypoint x="905" y="928"/>
+        <di:waypoint x="905" y="385"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_12_di" bpmnElement="sf_12">
+        <di:waypoint x="2030" y="805"/>
+        <di:waypoint x="2120" y="805"/>
+        <di:waypoint x="2120" y="675"/>
+        <di:waypoint x="2140" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_13_di" bpmnElement="sf_13">
+        <di:waypoint x="2190" y="675"/>
+        <di:waypoint x="2567" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_14_di" bpmnElement="sf_14">
+        <di:waypoint x="2190" y="675"/>
+        <di:waypoint x="2300" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sf_15_di" bpmnElement="sf_15">
+        <di:waypoint x="2450" y="675"/>
+        <di:waypoint x="2567" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="dia_1_di" bpmnElement="dia_1">
+        <di:waypoint x="485" y="450"/>
+        <di:waypoint x="485" y="385"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="nota_1_di" bpmnElement="nota_1">
+        <dc:Bounds x="410" y="980" width="230" height="74"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_2_di" bpmnElement="nota_2">
+        <dc:Bounds x="830" y="980" width="230" height="119"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_3_di" bpmnElement="nota_3">
+        <dc:Bounds x="2300" y="980" width="230" height="74"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="nota_4_di" bpmnElement="nota_4">
+        <dc:Bounds x="467" y="1119" width="230" height="59"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="as_nota_1_di" bpmnElement="as_nota_1">
+        <di:waypoint x="525" y="980"/>
+        <di:waypoint x="485" y="385"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_2_di" bpmnElement="as_nota_2">
+        <di:waypoint x="945" y="980"/>
+        <di:waypoint x="905" y="385"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_3_di" bpmnElement="as_nota_3">
+        <di:waypoint x="2415" y="980"/>
+        <di:waypoint x="2375" y="715"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="as_nota_4_di" bpmnElement="as_nota_4">
+        <di:waypoint x="582" y="1119"/>
+        <di:waypoint x="485" y="500"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

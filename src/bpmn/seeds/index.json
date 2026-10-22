@@ -1,0 +1,20 @@
+{
+  "files": [
+    "alianzas_como_nace_una_alianza.bpmn",
+    "clientes_que_pasa_despues_de_entregar.bpmn",
+    "clientes_que_pasa_despues_de_que_firman.bpmn",
+    "desarrollo_como_llega_un_producto_de_software_a_produccion.bpmn",
+    "finanzas_como_entra_un_peso_a_la_cuenta.bpmn",
+    "finanzas_como_entra_y_se_sale_la_plata.bpmn",
+    "finanzas_como_se_le_paga_a_alguien.bpmn",
+    "finanzas_la_quincena.bpmn",
+    "gobierno_como_se_gobierna_la_documentacion.bpmn",
+    "ia_como_se_convierte_un_trabajo_repetitivo_en_un_agente.bpmn",
+    "ia_como_se_usa_la_ia_en_rr_aliados.bpmn",
+    "informacion_de_donde_sale_la_respuesta.bpmn",
+    "legal_como_se_firma_un_contrato.bpmn",
+    "produccion_como_se_hace_una_pieza.bpmn",
+    "soporte_como_se_resuelve_un_problema_de_un_cliente.bpmn",
+    "ventas_como_una_oportunidad_se_convierte_en_cliente.bpmn"
+  ]
+}
